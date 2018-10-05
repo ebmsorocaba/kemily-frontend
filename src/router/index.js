@@ -6,7 +6,7 @@ import ListarUsuarios from '@/components/ListarUsuarios'
 import ListarPagamentos from '@/components/ListarPagamentos'
 import CriarUsuario from '@/components/CriarUsuario'
 import CriarAssociado from '@/components/CriarAssociado'
-
+import ResetSenha from '@/components/ResetSenha'
 // import Login from '@/components/Login'
 
 Vue.use(Router)
@@ -42,6 +42,11 @@ export default new Router({
       path: '/criar_associado',
       name: 'CriarAssociado',
       component: CriarAssociado
+    },
+    {
+      path: '/reset_senha',
+      name: 'ResetSenha',
+      component: ResetSenha
     }
     
   ]

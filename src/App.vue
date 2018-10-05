@@ -42,7 +42,7 @@
           </v-list-tile-action>
         </v-list-tile>
 
-        <v-list-tile :to="{name: 'Reset de Senha'}" >
+        <v-list-tile :to="{name: 'ResetSenha'}" >
           <v-list-tile-content>
             <v-list-tile-title>Reset de Senha</v-list-tile-title>
           </v-list-tile-content>
