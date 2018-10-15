@@ -1,6 +1,6 @@
 <template>
 <v-layout>
-    <v-flex xs8>
+    <v-flex xs12>
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-text-field
       v-model="nome"
