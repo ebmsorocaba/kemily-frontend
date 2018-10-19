@@ -1,39 +1,107 @@
 <template>
-  <v-app id="inspire">
-    <v-content>
-      <v-container fluid fill-height>
-        <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
-            <v-card class="elevation-12">
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>Login form</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>
-              <v-card-text>
-                <v-form>
-                  <v-text-field prepend-icon="person" name="login" label="Login" type="text"></v-text-field>
-                  <v-text-field id="password" prepend-icon="lock" name="password" label="Password" type="password"></v-text-field>
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary">Login</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
-  </v-app>
+<v-layout>
+    <v-flex xs8>
+  <v-form ref="form" v-model="valid" lazy-validation>
+    <v-text-field
+      v-model="nome"
+      :rules="nomeRules"
+      :counter="100"
+      label="Nome"
+      required
+    ></v-text-field>
+    <!--
+    <v-text-field
+      v-model="email"
+      :rules="emailRules"
+      label="E-mail"
+      required
+    ></v-text-field>
+
+
+    _____________
+
+          email: '',
+      emailRules: [
+        v => !!v || 'Informe o e-mail!',
+        v => /.+@.+../.test(v) || 'O E-mail deve ser valido!'
+      ],
+      
+     -->
+    <v-text-field
+      v-model="senha"
+      :append-icon="show1 ? 'visibility_off' : 'visibility'"
+      :rules="[rules.required]"
+      :type="show1 ? 'text' : 'password'"
+      name="senha"
+      label="Senha"
+      counter
+      @click:append="show1 = !show1"
+    ></v-text-field>
+
+    <v-btn
+      @click="submit"
+    >
+      Confirmar
+    </v-btn>
+    <v-btn @click="clear">Limpar</v-btn>
+  </v-form>
+    </v-flex>
+</v-layout>
 </template>
 
 <script>
+  import API from "@/lib/API";
+  import axios from "../http-common";
+
   export default {
     data: () => ({
-      drawer: null
+      valid: true,
+      nome: '',
+      show1: false,
+      rules: {
+        required: value => !!value || 'Informe a Senha!',
+      },
+      nomeRules: [
+        v => !!v || 'Informe o nome!',
+        v => (v && v.length <= 100) || 'O nome não deve ultrapassar o limite de caracteres'
+      ],
+      senha: '',
+      senhaRules: [
+        v => !!v || 'Informe a senha!',
+        v => (v && v.length <= 100) || 'A senha não deve ultrapassar o limite de caracteres'
+      ]
+
     }),
-    props: {
-      source: String
+
+    methods: {
+      submit () {
+        console.log("Create - Usuario");
+         confirm("Confirmar");
+
+        if (this.$refs.form.validate()) {
+          // Native form submission is not yet supported
+          
+          
+          axios.get("/usuario/" + this.nome 
+          + "?senha=" + this.senha)
+          
+          .then(function(response) {
+            if(response.status == 200){
+              window.location = '/'
+            }
+            else{
+              alert("Usuário ou senha incorreto")
+            }
+         console.log(response.data);
+      }).catch(function(error) {
+         console.log(error.response.data);
+
+      });
+        }
+      },
+      clear () {
+        this.$refs.form.reset()
+      }
     }
   }
 </script>
