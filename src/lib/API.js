@@ -1,8 +1,8 @@
 import ezFetch from 'ez-fetch'
 
 const associados_API = 'http://localhost:8080/api/associados'
-const usuarios_API = 'http://localhost:8080/api/usuarios'
-const pagamentos_API = 'http://localhost:8080/api/pagamentos'
+const usuarios_API = 'http://localhost:8080/api/usuario'
+const pagamentos_API = 'http://localhost:8080/api/pagamento'
 
 export default{
   getAssociados () {

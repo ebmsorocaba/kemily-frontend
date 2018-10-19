@@ -7,6 +7,7 @@ import ListarPagamentos from '@/components/ListarPagamentos'
 import CriarUsuario from '@/components/CriarUsuario'
 import CriarAssociado from '@/components/CriarAssociado'
 import ResetSenha from '@/components/ResetSenha'
+import Login from '@/components/Login'
 // import Login from '@/components/Login'
 
 Vue.use(Router)
@@ -19,35 +20,45 @@ export default new Router({
       component: Landing
     },
     {
+      path: '/login',
+      component: Login,
+      meta: {auth: false}
+    },
+    {
       path: '/listar_associados',
       name: 'ListarAssociados',
-      component: ListarAssociados
+      component: ListarAssociados,
+      meta: {auth: true}
     },
     {
       path: '/listar_usuarios',
       name: 'ListarUsuarios',
-      component: ListarUsuarios
+      component: ListarUsuarios,
+      meta: {auth: true}
     },
     {
       path: '/listar_pagamentos',
       name: 'ListarPagamentos',
-      component: ListarPagamentos
+      component: ListarPagamentos,
+      meta: {auth: true}
     },
     {
       path: '/criar_usuario',
       name: 'CriarUsuario',
-      component: CriarUsuario
+      component: CriarUsuario,
+      meta: {auth: true}
     },
     {
       path: '/criar_associado',
       name: 'CriarAssociado',
-      component: CriarAssociado
+      component: CriarAssociado,
+      meta: {auth: true}
     },
     {
       path: '/reset_senha',
       name: 'ResetSenha',
-      component: ResetSenha
+      component: ResetSenha,
+      meta: {auth: true}
     }
-    
   ]
 })
