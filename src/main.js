@@ -4,7 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'
-import VueResource from 'vue-resource'
+import VueAxios from 'vue-axios'
+import axios from 'axios'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import locale from 'element-ui/lib/locale/lang/pt-br'
@@ -15,20 +16,20 @@ import 'vuetify/dist/vuetify.min.css'
 Vue.config.productionTip = false
 Vue.use(Vuetify)
 
-Vue.use(VueResource)
+Vue.use(VueAxios, axios)
 Vue.use(ElementUI, {locale})
 
-Vue.http.options.root = process.env.API
+Vue.axios.defaults.baseURL = process.env.API
 Vue.router = router
 
 /* Autenticação das rotas */
 
 Vue.use(require('@websanova/vue-auth'), {
   auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
-  http: require('@websanova/vue-auth/drivers/http/vue-resource.1.x.js'),
+  http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
   router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
   rolesVar: 'type',
-  loginData: {url: 'user_token', method: 'POST', redirect: '/', fetchUser: false},
+  loginData: {url: 'login', method: 'POST', redirect: '/', fetchUser: false},
   fetchData: {url: 'auth/user', method: 'GET'},
   refreshData: {url: 'auth/refresh', method: 'GET', atInit: false}
 })

@@ -16,8 +16,8 @@
     data() {
       return {
         user: {
-          user: '',
-          password: ''
+          user: 'admin',
+          password: 'password'
         }
       }
     },
@@ -26,24 +26,25 @@
 
             // Auth
             this.$auth.login({
-            params: {auth: this.user},
-            success: function () {
-                this.$notify({
-                    title: 'Seja bem-vindo ' + user.user,
-                    message: 'Login efetuado com sucesso!',
-                    type: 'success'
-                })
-            },
-            error: function () {
-                this.$notify.error({
-                    title: 'Erro',
-                    message: 'Usuário ou senha incorretos!'
-                })
-            },
-            rememberMe: true,
-            redirect: '/signup'
+                headers:{'Content-Type': 'application/json'},
+                data: {username: this.user.user, password: this.user.password},
+                success: function () {
+                    this.$notify({
+                        title: 'Seja bem-vindo ' + this.user.user,
+                        message: 'Login efetuado com sucesso!',
+                        type: 'success'
+                    })
+                },
+                error: function () {
+                    this.$notify.error({
+                        title: 'Erro',
+                        message: 'Usuário ou senha incorretos!'
+                    })
+                },
+                rememberMe: true,
+                redirect: '/signup'
             })
-            return false;
+                return false;
         }
     }
   }
