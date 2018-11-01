@@ -1,5 +1,5 @@
 <template>
-  <div class="landing">
+  <div class="home">
     <v-btn :to="{name: 'ListarAssociados'}" color="info">Gerenciar Associados</v-btn>
     <v-btn :to="{name: 'ListarUsuarios'}" color="info">Gerenciar Usuarios</v-btn>
   </div>
@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'landing',
+  name: 'home',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'

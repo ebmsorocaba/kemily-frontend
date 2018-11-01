@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import API from "@/lib/API";
-import axios from "../http-common";
+import API from "@/http/API";
+import axios from "@/http/http-common";
 
 export default {
   data: () => ({

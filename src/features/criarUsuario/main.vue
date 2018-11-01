@@ -1,6 +1,6 @@
 <template>
-<v-layout>
-    <v-flex xs8>
+<v-layout (justify-center align-center)>
+    <v-flex xs12>
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-text-field
       v-model="nome"
@@ -9,24 +9,13 @@
       label="Nome"
       required
     ></v-text-field>
-    <!--
     <v-text-field
       v-model="email"
       :rules="emailRules"
       label="E-mail"
       required
     ></v-text-field>
-
-
-    _____________
-
-          email: '',
-      emailRules: [
-        v => !!v || 'Informe o e-mail!',
-        v => /.+@.+../.test(v) || 'O E-mail deve ser valido!'
-      ],
-      
-     -->
+    
     <v-text-field
       v-model="senha"
       :append-icon="show1 ? 'visibility_off' : 'visibility'"
@@ -37,8 +26,21 @@
       counter
       @click:append="show1 = !show1"
     ></v-text-field>
+   
+     <v-text-field
+      v-model="setor"
+      :rules="setorRules"
+      :counter="20"
+      label="Setor"
+      required
+    ></v-text-field>
+   <v-checkbox
+      v-model="ativo"
+      label="Ativo"
+    ></v-checkbox>
 
     <v-btn
+      :disabled="!valid"
       @click="submit"
     >
       Confirmar
@@ -50,8 +52,8 @@
 </template>
 
 <script>
-  import API from "@/lib/API";
-  import axios from "../http-common";
+import API from "@/http/API";
+import axios from "@/http/http-common";
 
   export default {
     data: () => ({
@@ -65,12 +67,22 @@
         v => !!v || 'Informe o nome!',
         v => (v && v.length <= 100) || 'O nome não deve ultrapassar o limite de caracteres'
       ],
+      email: '',
+      emailRules: [
+        v => !!v || 'Informe o e-mail!',
+        v => /.+@.+../.test(v) || 'O E-mail deve ser valido!'
+      ],
       senha: '',
       senhaRules: [
         v => !!v || 'Informe a senha!',
         v => (v && v.length <= 100) || 'A senha não deve ultrapassar o limite de caracteres'
-      ]
-
+      ],
+      setor: '',
+      setorRules: [
+        v => !!v || 'Informe o setor!',
+        v => (v && v.length <= 20) || 'O setor não deve ultrapassar o limite de caracteres'
+      ],      
+      checkbox: true
     }),
 
     methods: {
@@ -80,23 +92,16 @@
 
         if (this.$refs.form.validate()) {
           // Native form submission is not yet supported
-          
-          
-          axios.get("/usuario/" + this.nome 
-          + "?senha=" + this.senha)
-          
-          .then(function(response) {
-            if(response.status == 200){
-              window.location = '/'
-            }
-            else{
-              alert("Usuário ou senha incorreto")
-            }
-         console.log(response.data);
-      }).catch(function(error) {
-         console.log(error.response.data);
-
-      });
+          axios.post("/usuario", {
+            nome: this.nome,
+            senha: this.senha,
+            email: this.email,
+            setor: this.setor,
+            ativo: this.checkbox
+          })
+          .then(response => {
+            console.log(response);
+          });
         }
       },
       clear () {

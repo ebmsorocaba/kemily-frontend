@@ -1,4 +1,4 @@
-import ezFetch from 'ez-fetch';
+import ezFetch from 'ez-fetch'
 
 const associados_API = 'http://localhost:8080/api/associados'
 const usuarios_API = 'http://localhost:8080/api/usuarios'

@@ -1,15 +1,9 @@
 <template lang="html">
    <div>
     <v-toolbar flat color="white">
-      <v-toolbar-title>Gerenciamento de Pagamentos</v-toolbar-title>
-      <v-divider
-        class="mx-2"
-        inset
-        vertical
-      ></v-divider>
       <v-spacer></v-spacer>
       <v-dialog v-model="dialog" max-width="500px">
-        <v-btn slot="activator" color="primary" dark class="mb-2">Novo</v-btn>
+        <v-btn slot="activator" fab dark color="light-green"><v-icon dark>add</v-icon></v-btn>
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -52,6 +46,22 @@
       </v-dialog>
     </v-toolbar>
 
+    <div>
+      <v-text-field
+          v-model="search"
+          append-icon="search"
+          label="Pesquisar"
+          single-line
+          hide-details
+      ></v-text-field>
+    </div>
+
+     <v-divider
+        class="mx-2"
+        inset
+        vertical
+      ></v-divider>
+
     <v-data-table
       :headers="headers"
       :items="pagamentos"
@@ -85,41 +95,33 @@
         </td>
       </template>
       <template slot="no-data">
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
+        <v-btn color="primary" @click="initialize">Atualizar</v-btn>
       </template>
     </v-data-table>
     <div class="text-xs-center pt-2">
       <v-pagination v-model="pagination.page" :length="pages"></v-pagination>
   </div>
-
-  
-     <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
-
 </div>
   
 </template>
 
 <script>
-import API from "@/lib/API";
-import axios from "../http-common";
+import API from "@/http/API";
+import axios from "@/http/http-common";
 
 export default {
   data: () => ({
     search: "",
-    pagination: {rowsPerPage:5, totalItems:6},
+    pagination: {rowsPerPage:15},
     dialog: false,
     headers: [
       {
         text: "ID",
         align: "left",
         sortable: true,
-        value: "id"
+        value: "id",
+        visible: false
+
       },
       { text: "Nome", value: "formaPgto.associado.nome" },
       { text: "Valor Pago", value: "valorPago" },

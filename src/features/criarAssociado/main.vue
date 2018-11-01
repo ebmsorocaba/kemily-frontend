@@ -1,6 +1,6 @@
 <template>
 <v-layout>
-    <v-flex xs8>
+    <v-flex xs12>
         <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
             v-model="cpf"
@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import API from "@/lib/API";
-import axios from "../http-common";
+import API from "@/http/API";
+import axios from "@/http/http-common";
 
 export default {
   data: () => ({
