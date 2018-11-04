@@ -4,7 +4,6 @@
     app
     touchless
     dark
-    permanent
   )
     v-layout(justify-center wrap)
       img.my-sidebar__backdrop(src='~/@/assets/images/ebm_110.png' alt='ebm')

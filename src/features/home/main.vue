@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <v-btn :to="{name: 'ListarAssociados'}" color="info">Gerenciar Associados</v-btn>
-    <v-btn :to="{name: 'ListarUsuarios'}" color="info">Gerenciar Usuarios</v-btn>
+    
   </div>
 </template>
 

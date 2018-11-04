@@ -9,7 +9,7 @@
       dense
     )
     v-layout(justify-center align-center)
-      v-flex.text-xs-center(xs12 lg6)
+      v-flex.text-xs-center(xs12)
         v-layout(row wrap)
           v-flex(xs12)
             v-card.my-login__card
@@ -86,7 +86,7 @@ export default {
 <style lang="stylus" scoped>
   .my-login
     background-color: $app-primary
-    background-image: url(https://images.pexels.com/photos/240040/pexels-photo-240040.jpeg); //retirado de https://www.pexels.com/photo/bright-daylight-environment-forest-240040/
+    background-image: url(https://scontent.fcpq5-1.fna.fbcdn.net/v/t31.0-8/14990985_1257455100982269_1636527887612089625_o.jpg?_nc_cat=110&_nc_ht=scontent.fcpq5-1.fna&oh=6bc12b310d8b6a8462523e5c1b731890&oe=5C754152) //retirado de https://www.pexels.com/photo/bright-daylight-environment-forest-240040/
     background-size: cover;                                                                  //Imagem com direito de uso livre 
 
     &__logo

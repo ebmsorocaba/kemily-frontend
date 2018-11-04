@@ -23,7 +23,7 @@
         :search="search"
         :pagination.sync="pagination"
         hide-actions
-        class="elevation-3"
+        class="elevation-10"
       >
 
         <template slot="items" slot-scope="props">
@@ -49,28 +49,33 @@
             </v-icon>
           </td>
         </template>
+
         <template slot="no-data">
           <v-alert :value="true" color="error" icon="warning">
               Não foi possível efetuar a comunicação com o servidor.
               <v-btn color="white" @click="initialize">Atualizar</v-btn>
           </v-alert>
-          
         </template>
+
+        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+              Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
+        </v-alert>
       </v-data-table>
       <div class="text-xs-center pt-5">
         <v-pagination v-model="pagination.page" :length="pages" color="blue"></v-pagination>
     </div>
     <v-spacer></v-spacer>
 
-    <v-toolbar class="text-xs-right pa-2">
+    <v-toolbar>
         <v-dialog v-model="dialog" max-width="500px">
           <v-btn slot="activator" id="_add"
                   @click.native="limparCampos"
                   fab
                   dark
                   medium
+                  right
                   absolute
-                  left color="primary"
+                  color="green lighten"
           ><v-icon dark>person_add</v-icon></v-btn>
 
           <v-card>
@@ -102,7 +107,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Adicionar Usuário</v-btn>
-              <v-btn color="yellow darken-3" @click.native="limparCampos">Limpar</v-btn>
+              <v-btn color="yellow lighten-3" @click.native="limparCampos">Limpar</v-btn>
               <v-btn color="red darken-3" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
             </v-form>
@@ -333,7 +338,7 @@ export default {
 
 #_add {
   position: fixed;
-  bottom: -4px;
+  bottom: -5px;
   right: 10px;
 }
 </style>
