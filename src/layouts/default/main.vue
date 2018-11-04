@@ -7,20 +7,18 @@
       router-view
     app-footer
     app-dialog
-    app-snackbar
 </template>
 
 <script>
 import AppBar from '@/components/app-bar'
 import AppSidebar from '@/components/app-sidebar'
 import AppDialog from '@/components/app-dialog'
-import AppSnackbar from '@/components/app-snackbar'
 import AppFooter from '@/components/app-footer'
 
 export default {
   name: 'DefaultLayout',
 
-  components: { AppBar, AppSidebar, AppDialog, AppSnackbar, AppFooter },
+  components: { AppBar, AppSidebar, AppDialog, AppFooter },
 
   methods: {
 

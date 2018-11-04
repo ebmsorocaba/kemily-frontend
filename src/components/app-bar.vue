@@ -1,25 +1,17 @@
 <template lang="pug">
   v-toolbar.my-appbar(
     :color="$vuetify.breakpoint.smAndDown ? 'primary' : 'default'"
-    :dark="$vuetify.breakpoint.smAndDown"
+    dark
     flat
+    color="grey darken-3"
     fixed
     app
     dense
   )
     v-toolbar-side-icon(v-show="!backButton" @click.stop="toggleSidebar()")
-    v-btn(icon v-show="backButton" @click.stop="$router.back()")
-      v-icon arrow_back
     v-toolbar-title.my_appbar__default-title(v-if="!$slots.title") {{ $store.state.common.title }}
-    v-toolbar-title.my-appbar__title(v-if="$slots.title && (!$slots.smallTitle || $vuetify.breakpoint.mdAndUp)")
-      slot(name="title")
-    v-toolbar-title.my-appbar__small-title(v-if="$slots.smallTitle && $vuetify.breakpoint.smAndDown")
-      slot(name="smallTitle")
-    v-spacer
-    .my-appbar__icons(v-if="!$slots.smallIcons || $vuetify.breakpoint.mdAndUp")
-      slot(name="icons")
-    .my-appbar__small-icons(v-if="$slots.smallIcons && $vuetify.breakpoint.smAndDown")
-      slot(name="smallIcons")
+    v-toolbar-title.my-appbar__title(v-if="$slots.title")
+    slot(name="title")
 </template>
 
 <script>

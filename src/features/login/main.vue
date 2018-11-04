@@ -1,20 +1,12 @@
 <template lang="pug">
   v-container.my-login(fluid fill-height)
-    v-toolbar(
-      color="light-green"
-      flat
-      dark
-      fixed
-      app
-      dense
-    )
     v-layout(justify-center align-center)
       v-flex.text-xs-center(xs12)
         v-layout(row wrap)
           v-flex(xs12)
             v-card.my-login__card
               v-card-title.my-login__card-title(primary-title)
-                v-avatar(:size="250")
+                v-avatar(:size="230")
                   img(src='~/@/assets/images/ebm_290.png' alt='Logo')
 
               v-card-text

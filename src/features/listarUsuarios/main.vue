@@ -7,16 +7,11 @@
           append-icon="search"
           label="Pesquisar usuários..."
           single-line
+          background-color="green lighten-4"
           hide-details
         ></v-text-field>
       </v-card-title>
-
-      <v-divider
-          class="mx-2"
-          inset
-          vertical
-        ></v-divider>
-      
+ 
       <v-data-table
         :headers="headers"
         :items="usuarios"
@@ -61,18 +56,18 @@
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
         </v-alert>
       </v-data-table>
+
       <div class="text-xs-center pt-5">
         <v-pagination v-model="pagination.page" :length="pages" color="blue"></v-pagination>
     </div>
-    <v-spacer></v-spacer>
 
-    <v-toolbar>
+    
         <v-dialog v-model="dialog" max-width="500px">
           <v-btn slot="activator" id="_add"
                   @click.native="limparCampos"
                   fab
                   dark
-                  medium
+                  large
                   right
                   absolute
                   color="green lighten"
@@ -113,7 +108,6 @@
             </v-form>
           </v-card>
         </v-dialog>
-      </v-toolbar>
 
   </v-card>
   </div>
@@ -338,7 +332,7 @@ export default {
 
 #_add {
   position: fixed;
-  bottom: -5px;
-  right: 10px;
+  bottom: 15px;
+  right: 15px;
 }
 </style>
