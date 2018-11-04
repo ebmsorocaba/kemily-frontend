@@ -1,7 +1,7 @@
 <template lang="pug">
   v-app
     transition(name="slide" mode="out-in")
-      router-view
+    router-view
 </template>
 
 <script>

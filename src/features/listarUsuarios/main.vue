@@ -106,7 +106,7 @@
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Adicionar Usuário</v-btn>
+              <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Salvar</v-btn>
               <v-btn color="yellow lighten-3" @click.native="limparCampos">Limpar</v-btn>
               <v-btn color="red darken-3" @click.native="close">Cancelar</v-btn>
             </v-card-actions>

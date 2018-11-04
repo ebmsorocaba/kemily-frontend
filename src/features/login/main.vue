@@ -86,8 +86,9 @@ export default {
 <style lang="stylus" scoped>
   .my-login
     background-color: $app-primary
-    background-image: url(https://scontent.fcpq5-1.fna.fbcdn.net/v/t31.0-8/14990985_1257455100982269_1636527887612089625_o.jpg?_nc_cat=110&_nc_ht=scontent.fcpq5-1.fna&oh=6bc12b310d8b6a8462523e5c1b731890&oe=5C754152) //retirado de https://www.pexels.com/photo/bright-daylight-environment-forest-240040/
-    background-size: cover;                                                                  //Imagem com direito de uso livre 
+    background-image: url('../../assets/images/EBMbg3.jpg');
+    background-size: 100% 100%;                                                                  
+    background-repeat: no-repeat;
 
     &__logo
       max-width: 46px

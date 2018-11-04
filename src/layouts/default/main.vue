@@ -4,7 +4,7 @@
     app-bar
     v-content(style="padding-top: 48px;")
       transition(name="slide" mode="out-in")
-        router-view
+      router-view
     app-footer
     app-dialog
     app-snackbar
