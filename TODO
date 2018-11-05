@@ -1,0 +1,13 @@
+Fazer:
+login;
+reset de senha;
+relatório de pagamentos;
+implementar validações;
+
+
+Corrigir:
+cadastro de pagamentos não persiste no db;
+pesquisa na listagem de usuários não está funcionando;
+não permitir cadastros de campos nulos;
+alterar campos nulos, no momento alterações em campos nulos não persistem no banco de dados;
+
