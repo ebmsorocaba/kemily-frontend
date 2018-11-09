@@ -23,6 +23,7 @@
 
         <template slot="items" slot-scope="props">
           <td>{{ props.item.nome }}</td>
+          <!-- <td class="text-xs-right">{{ props.item.senha }}</td> -->
           <td class="text-xs-left">{{ props.item.setor }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
           <td class="text-xs-left">{{ props.item.ativo }}</td>
@@ -133,9 +134,9 @@ export default {
         text: "Nome",
         align: "left",
         sortable: false,
-        value: "Nome"
+        value: "nome"
       },
-      //{ text: "Senha", value: "senha", sortable: false},
+      //{ text: "Senha", value: "senha", sortable: false },
       { text: "Setor", value: "Setor", sortable: false },
       { text: "E-Mail", value: "E-Mail", sortable: false },
       { text: "Ativo", value: true, sortable: false },
@@ -160,9 +161,7 @@ export default {
     rules: {
       required: value => !!value || "Informe a Senha!"
     },
-    nomeRules: [
-      v => !!v || "Informe o nome!"
-    ],
+    nomeRules: [v => !!v || "Informe o nome!"],
     email: "",
     emailRules: [
       v => !!v || "Informe o e-mail!",
@@ -181,10 +180,6 @@ export default {
       v =>
         (v && v.length <= 20) ||
         "O setor não deve ultrapassar o limite de caracteres"
-    ],
-    ativo: "",
-    ativoRules: [
-      v => !!v || "Usuário Inativo!"
     ],
     setores: ["Administração", "Financeiro", "Social"]
   }),
@@ -213,23 +208,22 @@ export default {
 
     usuarios() {
       this.$nextTick(() => {
-        this.pagination.totalItems = this.usuarios.length
-      })
+        this.pagination.totalItems = this.usuarios.length;
+      });
     }
   },
 
   created() {
     this.initialize();
-
   },
 
   methods: {
     load() {
       API.getUsuarios().then(usuarios => (this.usuarios = usuarios));
       this.pagination.totalItems = this.usuarios.length;
+      this.pages();
       console.log("total items: " + this.pagination.totalItems);
       console.log("lenght: " + this.usuarios.length);
-
     },
     changeSort(column) {
       if (this.pagination.sortBy === column) {
@@ -271,8 +265,6 @@ export default {
     },
 
     save() {
-      //this.limparCampos();
-      //console.log(valid);
       if (this.editedIndex > -1) {
         console.log("Edit - Usuario");
 
@@ -315,10 +307,10 @@ export default {
 
     limparCampos() {
       (this.editedItem.nome = ""),
-      (this.editedItem.senha = ""),
-      (this.editedItem.email = ""),
-      (this.editedItem.setor = ""),
-      (this.editedItem.ativo = "");
+        (this.editedItem.senha = ""),
+        (this.editedItem.email = ""),
+        (this.editedItem.setor = ""),
+        (this.editedItem.ativo = "");
     }
   }
 };

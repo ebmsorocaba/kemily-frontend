@@ -73,7 +73,7 @@
                   right
                   absolute
                   color="green lighten"
-          ><v-icon dark>person_add</v-icon></v-btn>
+          ><v-icon dark>add</v-icon></v-btn>
 
           <v-card>
             <v-card-title>
@@ -99,7 +99,7 @@
                   <v-text-field v-model="editedItem.dataPgto" label="Data de Pgto"></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.formaPgto.formaPagamento" label="Forma de Pgto"></v-text-field>
+                  <v-select :items="formaspagto" v-model="editedItem.formaPgto.formaPagamento" label="Forma de Pgto" required></v-select>
                 </v-flex>
                 <v-flex xs12>
                   <v-text-field v-model="editedItem.vencimento" label="Vencimento"></v-text-field>
@@ -130,20 +130,13 @@ export default {
     search: "",
     valid: true,
     pagination: {
-      rowsPerPage: 10,
+      rowsPerPage: 8,
       totalItems: 0,
       sortBy: "nome"
     },
     dialog: false,
     headers: [
-      {
-        text: "CPF",
-        align: "left",
-        sortable: false,
-        value: "formaPgto.associado.cpf",
-        visible: false
-
-      },
+      { text: "CPF", value: "formaPgto.associado.cpf", sortable: false },
       { text: "Nome", value: "formaPgto.associado.nome", sortable: false },
       { text: "Valor Pago", value: "valorPago", sortable: false },
       { text: "Data de Pgto", value: "dataPgto", sortable: false },
@@ -158,40 +151,43 @@ export default {
       dataPgto: "",
       formaPgto: {
         associado: {
-          cpf: "",
-          //nome: ""
+          cpf: ""
         },
-        formaPagamento: "",
+        formaPagamento: "Dinheiro"
       },
-      
+
       vencimento: ""
     },
-    defaultItem: { 
+    defaultItem: {
       valorPago: "",
       dataPgto: "",
       formaPgto: {
         associado: {
-          cpf: "",
-          //nome: ""
+          cpf: ""
         },
-        formaPagamento: "",
+        formaPagamento: "Dinheiro"
       },
-      
+
       vencimento: ""
-    }
+    },
+    formaspagto: ["Boleto", "Cartão", "Dinheiro"]
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Novo Pagamento" : "Editar Pagamento";
     },
-    pages () {
-        if (this.pagination.rowsPerPage == null ||
-          this.pagination.totalItems == null
-        ) return 0
+    pages() {
+      if (
+        this.pagination.rowsPerPage == null ||
+        this.pagination.totalItems == null
+      )
+        return 0;
 
-        return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
-      },
+      return Math.ceil(
+        this.pagination.totalItems / this.pagination.rowsPerPage
+      );
+    }
   },
 
   watch: {
@@ -201,8 +197,8 @@ export default {
 
     pagamentos() {
       this.$nextTick(() => {
-        this.pagination.totalItems = this.pagamentos.length
-      })
+        this.pagination.totalItems = this.pagamentos.length;
+      });
     }
   },
 
@@ -213,7 +209,7 @@ export default {
   methods: {
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));
-       this.pagination.totalItems = this.pagamentos.length;
+      this.pagination.totalItems = this.pagamentos.length;
     },
 
     changeSort(column) {
@@ -253,10 +249,9 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-    
+
     save() {
       if (this.editedIndex > -1) {
-        
         console.log("Edit - Pagamento");
 
         axios
@@ -265,16 +260,13 @@ export default {
             valorPago: this.editedItem.valorPago,
             vencimento: this.editedItem.vencimento,
             dataPgto: this.editedItem.dataPgto,
-            formaPgto: this.editedItem.formaPgto    
-                   
+            formaPgto: this.editedItem.formaPgto
           })
           .then(response => {
-              console.log(response);
+            console.log(response);
           });
-        
+
         Object.assign(this.pagamentos[this.editedIndex], this.editedItem);
-        
-        
       } else {
         console.log("Create - Pagamento");
         console.log(this.editedItem.formaPgto.formaPagamento);
@@ -284,12 +276,12 @@ export default {
             vencimento: this.editedItem.vencimento,
             dataPgto: this.editedItem.dataPgto,
             formaPgto: {
-                associado: {
-                    cpf: this.editedItem.formaPgto.associado.cpf
-                },
-                formaPagamento: this.editedItem.formaPgto.formaPagamento,
-                atual: "true"
-            }         
+              associado: {
+                cpf: this.editedItem.formaPgto.associado.cpf
+              },
+              formaPagamento: this.editedItem.formaPgto.formaPagamento,
+              atual: "true"
+            }
           })
           .then(response => {
             console.log(response);
@@ -301,13 +293,13 @@ export default {
     },
 
     limparCampos() {
-      (this.editedItem.formaPgto.associado.cpf = ""),
-      (this.editedItem.formaPgto.associado.nome = ""),
-      (this.editedItem.valorPago = ""),
-      (this.editedItem.vencimento = ""),
-      (this.editedItem.id = ""),
-      (this.editedItem.formaPgto = ""),
-      (this.editedItem.dataPgto = "");
+      // (this.editedItem.formaPgto.associado.cpf = ""),
+      // (this.editedItem.formaPgto.associado.nome = ""),
+      //(this.editedItem.valorPago = ""),
+      // (this.editedItem.vencimento = ""),
+      // (this.editedItem.id = ""),
+      // (this.editedItem.formaPgto = ""),
+      //(this.editedItem.dataPgto = "");
     }
   }
 };

@@ -7,18 +7,18 @@ import * as constants from '@/constants'
 
 export default {
 
-  install (Vue, options) {
+  install(Vue, options) {
     Vue.prototype.$auth = Vue.auth = axios.create()
 
     this.setDefaults()
     this.addInterceptors()
   },
 
-  setDefaults () {
+  setDefaults() {
     Vue.auth.defaults.baseURL = constants.API_BASE_URL
   },
 
-  addInterceptors () {
+  addInterceptors() {
     // Watch for accessToken changes and update our common Auth header.
     store.watch((state) => {
       return state.auth.accessToken
@@ -50,7 +50,7 @@ export default {
     })
   },
 
-  isInvalidToken (response) {
+  isInvalidToken(response) {
     const status = response.status
     const error = response.data.error
 
@@ -58,27 +58,29 @@ export default {
     return (status === 401 && (error === 'invalid_token' || error === 'expired_token'))
   },
 
-  refreshToken (request) {
+  refreshToken(request) {
     return axios({
-      method: 'post',
-      url: constants.REFRESH_TOKEN_URL,
-      // headers: {'Authorization': 'Basic ' + CLIENT_SECRET},
-      data: {
-        grant_type: 'refresh_token',
-        refresh_token: store.state.auth.refreshToken
-      }
-    })
+        method: 'post',
+        url: constants.REFRESH_TOKEN_URL,
+        // headers: {'Authorization': 'Basic ' + CLIENT_SECRET},
+        data: {
+          grant_type: 'refresh_token',
+          refresh_token: store.state.auth.refreshToken
+        }
+      })
       .then((response) => {
         this.storeToken(response)
         return this.retry(request)
       })
       .catch((errorResponse) => {
-        if (this.isInvalidToken(errorResponse)) { this.logout() }
+        if (this.isInvalidToken(errorResponse)) {
+          this.logout()
+        }
         return errorResponse
       })
   },
 
-  storeToken (response) {
+  storeToken(response) {
     const auth = store.state.auth
 
     auth.isLoggedIn = true
@@ -91,9 +93,13 @@ export default {
     store.dispatch('auth/update', auth)
   },
 
-  retry (request) {
+  retry(request) {
     return Vue.auth(request)
-      .then((response) => { return response })
-      .catch((response) => { return response })
+      .then((response) => {
+        return response
+      })
+      .catch((response) => {
+        return response
+      })
   }
 }

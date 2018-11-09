@@ -127,7 +127,7 @@ export default {
   data: () => ({
     search: "",
     valid: true,
-    pagination: { 
+    pagination: {
       rowsPerPage: 10,
       totalItems: 0,
       sortBy: "nome"
@@ -143,13 +143,14 @@ export default {
       { text: "Nome", value: "nome", sortable: false },
       { text: "Celular", value: "celular", sortable: false },
       { text: "E-Mail", value: "email", sortable: false },
-      { text: "Valor", value: "valorAtual", sortable: false},
+      { text: "Valor", value: "valorAtual", sortable: false },
       { text: "Vencimento", value: "vencAtual", sortable: false },
       { text: "Opções", value: "Opções", sortable: false }
     ],
     associados: [],
     editedIndex: -1,
     editedItem: {
+      cpf: "",
       nome: "",
       celular: "",
       email: "",
@@ -157,6 +158,7 @@ export default {
       vencAtual: 0
     },
     defaultItem: {
+      cpf: "",
       nome: "",
       celular: "",
       email: "",
@@ -189,8 +191,8 @@ export default {
 
     associados() {
       this.$nextTick(() => {
-        this.pagination.totalItems = this.associados.length
-      })
+        this.pagination.totalItems = this.associados.length;
+      });
     }
   },
 
@@ -200,8 +202,8 @@ export default {
 
   methods: {
     load() {
-    API.getAssociados().then(associados => (this.associados = associados));
-     this.pagination.totalItems = this.associados.length;
+      API.getAssociados().then(associados => (this.associados = associados));
+      this.pagination.totalItems = this.associados.length;
     },
 
     changeSort(column) {
@@ -282,11 +284,11 @@ export default {
     },
     limparCampos() {
       (this.editedItem.cpf = ""),
-      (this.editedItem.nome = ""),
-      (this.editedItem.celular = ""),
-      (this.editedItem.email = ""),
-      (this.editedItem.valorAtual = ""),
-      (this.editedItem.vencAtual = "");
+        (this.editedItem.nome = ""),
+        (this.editedItem.celular = ""),
+        (this.editedItem.email = ""),
+        (this.editedItem.valorAtual = ""),
+        (this.editedItem.vencAtual = "");
     }
   }
 };

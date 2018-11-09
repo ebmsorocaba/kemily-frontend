@@ -4,6 +4,7 @@
     app
     touchless
     dark
+    :width="300"
   )
     v-layout(justify-center wrap)
       img.my-sidebar__backdrop(src='~/@/assets/images/ebm_290.png' id='ebm')
@@ -58,39 +59,39 @@
 </template>
 
 <script>
-import auth from '@/auth/helpers'
+import auth from "@/auth/helpers";
 
 export default {
-  name: 'AppSidebar',
+  name: "AppSidebar",
 
   computed: {
     isActive: {
-      get () {
-        return this.$store.state.common.sidebar.visible
+      get() {
+        return this.$store.state.common.sidebar.visible;
       },
-      set (val) {
-        this.$store.dispatch('common/updateSidebar', { visible: val })
+      set(val) {
+        this.$store.dispatch("common/updateSidebar", { visible: val });
       }
     }
   },
 
   methods: {
-    logout () {
-      auth.logout()
+    logout() {
+      auth.logout();
     }
   }
-}
+};
 </script>
 
 <style lang="stylus">
-  .my-sidebar
-    z-index: 8
+.my-sidebar {
+  z-index: 8;
+}
 
-  #ebm {
-      padding-top: 20px
-      padding-bottom: 20px
-      height: 200px
-      border-radius: 100%;
-  }
-
+#ebm {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  height: 150px;
+  border-radius: 100%;
+}
 </style>
