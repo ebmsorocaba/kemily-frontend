@@ -199,7 +199,7 @@ export default {
         text: "Nome",
         align: "left",
         sortable: false,
-        value: "Nome"
+        value: "nome"
       },
       //{ text: "Senha", value: "senha", sortable: false},
       { text: "Setor", value: "Setor", sortable: false },
@@ -365,7 +365,7 @@ export default {
               email: this.editedItem.email,
               setor: this.editedItem.setor,
               perguntasecreta: this.editedItem.perguntasecreta,
-              respostasecreta: this.editedItem.resposta,
+              respostasecreta: this.editedItem.respostasecreta,
               ativo: this.editedItem.ativo
             })
             .then(response => {
@@ -386,7 +386,7 @@ export default {
               email: this.editedItem.email,
               setor: this.editedItem.setor,
               perguntasecreta: this.editedItem.perguntasecreta,
-              respostasecreta: this.editedItem.resposta,
+              respostasecreta: this.editedItem.respostasecreta,
               ativo: this.editedItem.ativo
             })
             .then(response => {
@@ -404,6 +404,7 @@ export default {
       (this.editedItem.perguntasecreta =
         "Qual é o nome do seu animal de estimação?"),
         (this.editedItem.respostasecreta = ""),
+        (this.editedItem.codigo = ""),
         (this.editedItem.nome = ""),
         (this.editedItem.senha = ""),
         (this.editedItem.email = ""),
