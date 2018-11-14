@@ -7,7 +7,6 @@
           append-icon="search"
           label="Pesquisar usuários..."
           single-line
-          background-color="green lighten-4"
           hide-details
         ></v-text-field>
       </v-card-title>
@@ -18,7 +17,7 @@
         :search="search"
         :pagination.sync="pagination"
         hide-actions
-        class="elevation-10"
+        class="elevation-3"
       >
 
         <template slot="items" slot-scope="props">
@@ -29,7 +28,6 @@
           <td class="justify-left">
             <v-icon
               small
-              color="blue"
               class="mr-2"
               @click="editItem(props.item)"
             >
@@ -37,7 +35,6 @@
             </v-icon>
             <v-icon
               small
-              color="red"
               @click="deleteItem(props.item)"
             >
               delete
@@ -46,13 +43,13 @@
         </template>
 
         <template slot="no-data">
-          <v-alert :value="true" color="error" icon="warning">
+          <v-alert :value="true" color="grey" icon="warning">
               Não foi possível efetuar a comunicação com o servidor.
               <v-btn color="white" @click="initialize">Atualizar</v-btn>
           </v-alert>
         </template>
 
-        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+        <v-alert slot="no-results" :value="true" color="grey" icon="warning">
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
         </v-alert>
       </v-data-table>
@@ -72,42 +69,107 @@
                   absolute
                   color="green lighten"
           ><v-icon dark>person_add</v-icon></v-btn>
-
+        
           <v-card>
             <v-card-title>
               <span class="headline">{{ formTitle }}</span>
             </v-card-title>
-            <v-form ref="form" v-model="valid" lazy-validation>
+
+            <!--Inicio do form de cadastros/alteracoes -->
+            <form>
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
+                    
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.nome" label="Nome" :rules="nomeRules" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|email'"
+                        v-model="editedItem.email"
+                        :error-messages="errors.collect('email')"
+                        label="E-Mail"   
+                        data-vv-name="email"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field id="passField" v-model="editedItem.senha" label="Senha" :rules="[rules.required]" :type="exibirSenha ? 'text' : 'password'" required></v-text-field>
+                      <v-text-field 
+                        v-validate="'required|min:1'"
+                        v-model="editedItem.nome"
+                        :error-messages="errors.collect('nome')"
+                        label="Nome"
+                        data-vv-name="nome"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-select :items="setores" v-model="editedItem.setor" label="Setor"  :rules="setorRules" required></v-select>
+                      <v-text-field
+                        v-validate="'required|min:5'"
+                        v-model="editedItem.senha"
+                        :error-messages="errors.collect('senha')"
+                        :type="exibirSenha ? 'text' : 'password'"
+                        label="Senha"
+                        data-vv-name="senha"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.email" label="E-Mail" :rules="emailRules" required></v-text-field>
+                      <v-select
+                        v-validate="'required'"
+                        :items="setores"
+                        v-model="editedItem.setor"
+                        :error-messages="errors.collect('setor')"
+                        label="Setor"
+                        data-vv-name="setor"
+                        required
+                      ></v-select>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-switch :label="'Ativo'" color="green light" v-model="editedItem.ativo" :rules="ativoRules"></v-switch>
+                      <v-select
+                        v-validate="'required'"
+                        :items="perguntas"
+                        v-model="editedItem.perguntasecreta"
+                        :error-messages="errors.collect('perguntasecreta')"
+                        label="Pergunta Secreta"
+                        data-vv-name="perguntasecreta"
+                        required
+                      ></v-select>
                     </v-flex>
+
+                    <v-flex xs12>
+                      <v-text-field
+                        v-validate="'required|min:5'"
+                        v-model="editedItem.respostasecreta"
+                        :error-messages="errors.collect('respostasecreta')"
+                        :type="exibirSenha ? 'text' : 'password'"
+                        label="Resposta"
+                         data-vv-name="respostasecreta"
+                        required
+                      ></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12>
+                      <v-switch
+                        :label="'Ativo'"
+                        color="green light"
+                        v-model="editedItem.ativo"
+                      ></v-switch>
+                    </v-flex>
+
                   </v-layout>
                 </v-container>
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Salvar</v-btn>
-              <v-btn color="yellow lighten-3" @click.native="limparCampos">Limpar</v-btn>
-              <v-btn color="red darken-3" @click.native="close">Cancelar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="!valid">Salvar</v-btn>
+              <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
-            </v-form>
-          </v-card>
-        </v-dialog>
+          </form>
+        </v-card>
+      </v-dialog>
 
   </v-card>
   </div>
@@ -118,6 +180,10 @@ import API from "@/http/API";
 import axios from "@/http/http-common";
 
 export default {
+  $_veeValidate: {
+    validator: "new"
+  },
+
   data: () => ({
     search: "",
     valid: true,
@@ -144,49 +210,61 @@ export default {
     usuarios: [],
     editedIndex: -1,
     editedItem: {
+      id: "",
       nome: "",
       senha: "",
       email: "",
-      setor: "",
+      setor: "Administração",
+      perguntasecreta: "Qual é o nome do seu animal de estimação?",
+      respostasecreta: "",
       ativo: true
     },
     defaultItem: {
+      id: "",
       nome: "",
       senha: "",
       email: "",
-      setor: "",
+      setor: "Administração",
+      perguntasecreta: "Qual é o nome do seu animal de estimação?",
+      respostasecreta: "",
       ativo: true
     },
-    rules: {
-      required: value => !!value || "Informe a Senha!"
+    dictionary: {
+      attributes: {},
+      custom: {
+        nome: {
+          required: () => "Informe o nome do usuário!",
+          min: "Informe o nome do usuário!"
+        },
+        senha: {
+          required: () => "Informe a senha do usuário!",
+          min: "A senha deve conter no minimo 5 caracteres!"
+        },
+        email: {
+          required: () => "Informe o e-mail do usuário!",
+          email: "Informe um e-mail valido! Exemplo: teste@teste.com"
+        },
+        setor: {
+          required: "Selecione o setor do usuário!"
+        },
+        perguntasecreta: {
+          required: "Selecione uma pergunta secreta!"
+        },
+        respostasecreta: {
+          required: () => "Informe a resposta da pergunta secreta!",
+          min:
+            "A resposta da pergunta secreta deve conter no minimo 5 caracteres!"
+        }
+      }
     },
-    nomeRules: [
-      v => !!v || "Informe o nome!"
-    ],
-    email: "",
-    emailRules: [
-      v => !!v || "Informe o e-mail!",
-      v => /.+@.+../.test(v) || "O E-mail deve ser valido!"
-    ],
-    senha: "",
-    senhaRules: [
-      v => !!v || "Informe a senha!",
-      v =>
-        (v && v.length <= 100) ||
-        "A senha não deve ultrapassar o limite de caracteres"
-    ],
     setor: "",
-    setorRules: [
-      v => !!v || "Informe o setor!",
-      v =>
-        (v && v.length <= 20) ||
-        "O setor não deve ultrapassar o limite de caracteres"
-    ],
-    ativo: "",
-    ativoRules: [
-      v => !!v || "Usuário Inativo!"
-    ],
-    setores: ["Administração", "Financeiro", "Social"]
+    setores: ["Administração", "Financeiro", "Social"],
+    perguntasecreta: "",
+    perguntas: [
+      "Qual é o nome do seu animal de estimação?",
+      "Qual é o nome da sua mãe?",
+      "Qual é o nome da sua cidade natal?"
+    ]
   }),
 
   computed: {
@@ -213,14 +291,17 @@ export default {
 
     usuarios() {
       this.$nextTick(() => {
-        this.pagination.totalItems = this.usuarios.length
-      })
+        this.pagination.totalItems = this.usuarios.length;
+      });
     }
   },
 
   created() {
     this.initialize();
+  },
 
+  mounted() {
+    this.$validator.localize("en", this.dictionary);
   },
 
   methods: {
@@ -229,7 +310,6 @@ export default {
       this.pagination.totalItems = this.usuarios.length;
       console.log("total items: " + this.pagination.totalItems);
       console.log("lenght: " + this.usuarios.length);
-
     },
     changeSort(column) {
       if (this.pagination.sortBy === column) {
@@ -271,12 +351,12 @@ export default {
     },
 
     save() {
-      //this.limparCampos();
-      //console.log(valid);
+      this.$validator.validateAll();
+
       if (this.editedIndex > -1) {
         console.log("Edit - Usuario");
 
-        if (this.$refs.form.validate()) {
+        if (this.$validator.validateAll()) {
           axios
             .put("/usuario/" + this.editedItem.nome, {
               nome: this.editedItem.nome,
@@ -294,7 +374,7 @@ export default {
       } else {
         console.log("Create - Usuario");
 
-        if (this.$refs.form.validate()) {
+        if (this.$validator.validateAll()) {
           axios
             .post("/usuario", {
               nome: this.editedItem.nome,
@@ -310,15 +390,20 @@ export default {
 
         this.usuarios.push(this.editedItem);
       }
+      //this.$validator.reset()
       this.close();
     },
 
     limparCampos() {
-      (this.editedItem.nome = ""),
-      (this.editedItem.senha = ""),
-      (this.editedItem.email = ""),
-      (this.editedItem.setor = ""),
-      (this.editedItem.ativo = "");
+      (this.editedItem.perguntasecreta =
+        "Qual é o nome do seu animal de estimação?"),
+        (this.editedItem.respostasecreta = ""),
+        (this.editedItem.nome = ""),
+        (this.editedItem.senha = ""),
+        (this.editedItem.email = ""),
+        (this.editedItem.setor = "Administração"),
+        (this.editedItem.ativo = false),
+        this.$validator.reset();
     }
   }
 };

@@ -9,12 +9,6 @@ const defaults = {
     visible: false,
     text: ''
   },
-  snackbar: {
-    visible: false,
-    text: '',
-    timeout: 6000,
-    color: ''
-  },
   error: {
     code: null,
     level: null,
@@ -43,10 +37,6 @@ export default {
 
     updateDialog (state, options) {
       state.dialog = Object.assign({}, defaults.dialog, options)
-    },
-
-    updateSnackbar (state, options) {
-      state.snackbar = Object.assign({}, defaults.snackbar, options)
     },
 
     error (state, options) {
@@ -78,10 +68,6 @@ export default {
 
     updateDialog ({ commit }, options) {
       commit('updateDialog', options)
-    },
-
-    updateSnackbar ({ commit }, options) {
-      commit('updateSnackbar', options)
     }
   }
 }

@@ -2,8 +2,8 @@
 export const DEBUG = true
 
 // Backend API endpoints
-export const API_BASE_URL = '/api'
-export const REFRESH_TOKEN_URL = '/auth'
+export const API_BASE_URL = 'http://localhost:8080/api'
+export const REFRESH_TOKEN_URL = 'http://localhost:8080/auth'
 
 /**
  * Key for local storage.

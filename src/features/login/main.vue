@@ -12,8 +12,8 @@
               v-card-text
                 v-form
                   v-text-field(
-                    label='Usuário'
-                    v-model='credentials.usuario'
+                    label='E-Mail'
+                    v-model='credentials.email'
                     required
                   )
                   v-text-field(
@@ -38,74 +38,81 @@
 </template>
 
 <script>
-import auth from '@/auth/helpers'
-
+import auth from "@/auth/helpers";
 
 export default {
-  name: 'LoginPage',
+  name: "LoginPage",
 
-  data () {
+  data() {
     return {
       passwordHidden: true,
       credentials: {
-        usuario: 'teste',
-        senha: 'teste'
+        email: "admin@admin",
+        senha: "admin"
       },
-      error: '',
+      error: "",
       loading: false
-    }
+    };
   },
 
   methods: {
-    login () {
-      this.loading = true
+    login() {
+      this.loading = true;
 
       const credentials = {
-        username: this.credentials.username,
-        password: this.credentials.password
-      }
+        email: this.credentials.email,
+        senha: this.credentials.senha
+      };
 
-      //auth.login(credentials, 'home', ({isSuccess, data, errorMessage}) => {
-      auth.fakeLogin(credentials, 'home')
-        .then((data) => {
-          this.loading = false
-        })
+      console.log(credentials);
+
+      auth.login(credentials, "home", ({ isSuccess, data, errorMessage }) => {
+        //auth.fakeLogin(credentials, "home").then(data => {
+        console.log("login");
+        this.loading = false;
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="stylus" scoped>
-  .my-login
-    background-color: $app-primary
-    background-image: url('../../assets/images/EBMbg3.jpg');
-    background-size: 100% 100%;                                                                  
-    background-repeat: no-repeat;
+.my-login {
+  background-color: $app-primary;
+  background-image: url('../../assets/images/EBMbg3.jpg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 
-    &__logo
-      max-width: 46px
-      padding-left: 12px
-      padding-top: 4px
+  &__logo {
+    max-width: 46px;
+    padding-left: 12px;
+    padding-top: 4px;
+  }
 
-    &__logo-name
+  &__logo-name {
+    img {
+      max-width: 150px;
+      width: 100%;
+    }
+  }
 
-      img
-        max-width: 150px
-        width: 100%
+  &__subheading {
+    color: white;
+    padding-top: 10px;
+    padding-bottom: 20px;
+  }
 
-    &__subheading
-      color: white
-      padding-top: 10px
-      padding-bottom: 20px
+  &__card {
+    max-width: 300px;
+    margin: 0 auto;
+  }
 
-    &__card
-      max-width: 300px
-      margin: 0 auto
+  &__card-title {
+    justify-content: center;
+  }
 
-    &__card-title
-      justify-content: center
-
-    &__card-actions
-      justify-content: center
-
+  &__card-actions {
+    justify-content: center;
+  }
+}
 </style>

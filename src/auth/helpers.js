@@ -1,9 +1,11 @@
 import Vue from 'vue'
-import { router } from '@/http'
+import {
+  router
+} from '@/http'
 import store from '@/store'
 import auth from './'
 
-const LOGIN_URL = '/auth'
+const LOGIN_URL = 'http://localhost:8080/login'
 
 // const CLIENT_SECRET = 'ZGVtb2FwcDpkZW1vcGFzcw==' // Base64(client_id:client_secret) "demoapp:demopass"
 
@@ -21,21 +23,25 @@ export default {
       method: 'post',
       url: LOGIN_URL,
       // headers: {
-      //  'Authorization': 'Basic ' + CLIENT_SECRET,
+      //  'Authorization': 'Basic ' + CLIENT_SECRET,npm start
       //  'Content-Type': 'application/x-www-form-urlencoded'
       // },
       data: this.URLSearchParams({
-        grant_type: 'password',
-        client_id: 'demoapp',
-        client_secret: 'demopass',
-        username: creds.username,
-        password: creds.password
+        // grant_type: 'password',
+        // client_id: '',
+        // client_secret: '',
+        email: creds.email,
+        senha: creds.senha
       })
     })
       .then((response) => {
         auth.storeToken(response)
 
-        if (redirect) router.push({ name: redirect })
+        if (redirect) {
+          router.push({
+            name: redirect
+          })
+        }
         return response
       })
       .catch((error) => {
@@ -51,14 +57,25 @@ export default {
 
   logout () {
     store.dispatch('common/clear')
-    router.push({ name: 'login' })
+    router.push({
+      name: 'login'
+    })
   },
 
   fakeLogin (creds, redirect) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        auth.storeToken({data: { accessToken: '123456789', refreshToken: '77777777' }})
-        if (redirect) router.push({ name: redirect })
+        auth.storeToken({
+          data: {
+            accessToken: '123456789',
+            refreshToken: '77777777'
+          }
+        })
+        if (redirect) {
+          router.push({
+            name: redirect
+          })
+        }
         resolve({})
       }, 500)
     })

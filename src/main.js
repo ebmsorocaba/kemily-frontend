@@ -3,12 +3,17 @@
 import Vue from 'vue'
 import App from './App'
 import store from './store'
-import { sync } from 'vuex-router-sync'
-import { http, router } from './http'
+import {
+  sync
+} from 'vuex-router-sync'
+import {
+  http,
+  router
+} from './http'
 import auth from './auth'
 import Vuetify from 'vuetify'
 import URLSearchParams from 'url-search-params'
-// import VeeValidate from 'vee-validate'
+import VeeValidate from 'vee-validate'
 import 'vuetify/dist/vuetify.min.css'
 import Loading from './components/loading'
 import Appbar from './components/app-bar'
@@ -25,7 +30,7 @@ sync(store, router)
 // Http and Auth plugins
 Vue.use(http)
 Vue.use(auth)
-// Vue.use(VeeValidate)
+Vue.use(VeeValidate)
 Vue.use(Vuetify, {
   theme: {
     primary: '#21CE99',
