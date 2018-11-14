@@ -66,8 +66,8 @@ export default {
 
       console.log(credentials);
 
-      auth.login(credentials, "home", ({ isSuccess, data, errorMessage }) => {
-        //auth.fakeLogin(credentials, "home").then(data => {
+      //auth.login(credentials, "home", ({ isSuccess, data, errorMessage }) => {
+        auth.fakeLogin(credentials, "home").then(data => {
         console.log("login");
         this.loading = false;
       });
