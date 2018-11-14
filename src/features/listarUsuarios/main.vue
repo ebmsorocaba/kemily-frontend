@@ -201,9 +201,9 @@ export default {
         value: "nome"
       },
       //{ text: "Senha", value: "senha", sortable: false},
-      { text: "Setor", value: "Setor", sortable: false },
-      { text: "E-Mail", value: "E-Mail", sortable: false },
-      { text: "Ativo", value: true, sortable: false },
+      { text: "Setor", value: "setor", sortable: false },
+      { text: "E-Mail", value: "email", sortable: false },
+      { text: "Ativo", value: "ativo", sortable: false },
       { text: "Opções", value: "Opções", sortable: false }
     ],
     usuarios: [],
@@ -424,7 +424,7 @@ export default {
         this.usuarios.push(this.editedItem);
       }
       //this.$validator.reset()
-      // this.close();
+      this.close();
     },
 
     limparCampos() {
