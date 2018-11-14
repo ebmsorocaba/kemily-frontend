@@ -76,7 +76,7 @@
             </v-card-title>
 
             <!--Inicio do form de cadastros/alteracoes -->
-            <form>
+            <form @submit.prevent="validadeBeforeSubmit" novalidate>
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
@@ -94,7 +94,7 @@
 
                     <v-flex xs12>
                       <v-text-field 
-                        v-validate="'required|min:1'"
+                        v-validate="'required|min:4|alpha_spaces'"
                         v-model="editedItem.nome"
                         :error-messages="errors.collect('nome')"
                         label="Nome"
@@ -164,7 +164,7 @@
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="!valid">Salvar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="errors.any() || !isCompleted">Salvar</v-btn>
               <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
           </form>
@@ -186,7 +186,6 @@ export default {
 
   data: () => ({
     search: "",
-    valid: true,
     exibirSenha: false,
     pagination: {
       rowsPerPage: 10,
@@ -234,7 +233,8 @@ export default {
       custom: {
         nome: {
           required: () => "Informe o nome do usuário!",
-          min: "Informe o nome do usuário!"
+          min: "O nome do usuário deve conter no minimo 4 caracteres!",
+          alpha_spaces: "Informe um nome valido!"
         },
         senha: {
           required: () => "Informe a senha do usuário!",
@@ -281,6 +281,14 @@ export default {
       return Math.ceil(
         this.pagination.totalItems / this.pagination.rowsPerPage
       );
+    },
+    isCompleted() {
+      return (
+        this.editedItem.nome &&
+        this.editedItem.senha &&
+        this.editedItem.email &&
+        this.editedItem.respostasecreta
+      );
     }
   },
 
@@ -301,7 +309,7 @@ export default {
   },
 
   mounted() {
-    this.$validator.localize("en", this.dictionary);
+    this.$validator.localize("pt", this.dictionary);
   },
 
   methods: {
@@ -350,13 +358,26 @@ export default {
       }, 300);
     },
 
+    validateBeforeSubmit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          alert("From Submitted!");
+          return;
+        }
+      });
+    },
+
     save() {
       this.$validator.validateAll();
 
-      if (this.editedIndex > -1) {
+      if (this.editedIndex > -1 && this.$validator.validateAll()) {
         console.log("Edit - Usuario");
+        console.log(this.$validator.validateAll());
 
         if (this.$validator.validateAll()) {
+          console.log(
+            "alterar| validador retornou: " + this.$validator.validateAll()
+          );
           axios
             .put("/usuario/" + this.editedItem.codigo, {
               codigo: this.editedItem.codigo,
@@ -370,6 +391,9 @@ export default {
             })
             .then(response => {
               console.log(response);
+              console.log(
+                "alterar| validador retornou: " + this.$validator.validateAll()
+              );
             });
         }
 
@@ -378,6 +402,9 @@ export default {
         console.log("Create - Usuario");
 
         if (this.$validator.validateAll()) {
+          console.log(
+            "salvar| validador retornou: " + this.$validator.validateAll()
+          );
           axios
             .post("/usuario", {
               codigo: this.editedItem.codigo,
@@ -397,7 +424,7 @@ export default {
         this.usuarios.push(this.editedItem);
       }
       //this.$validator.reset()
-      this.close();
+      // this.close();
     },
 
     limparCampos() {
