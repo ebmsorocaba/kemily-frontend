@@ -210,7 +210,7 @@ export default {
     usuarios: [],
     editedIndex: -1,
     editedItem: {
-      id: "",
+      codigo: "",
       nome: "",
       senha: "",
       email: "",
@@ -220,7 +220,7 @@ export default {
       ativo: true
     },
     defaultItem: {
-      id: "",
+      codigo: "",
       nome: "",
       senha: "",
       email: "",
@@ -336,7 +336,7 @@ export default {
         this.usuarios.splice(index, 1);
 
       console.log("Delete - Usuario");
-      axios.delete("/usuario/" + item.nome).then(response => {
+      axios.delete("/usuario/" + item.codigo).then(response => {
         console.log(response);
         //this.pagination.hotUpdate;
       });
@@ -358,11 +358,14 @@ export default {
 
         if (this.$validator.validateAll()) {
           axios
-            .put("/usuario/" + this.editedItem.nome, {
+            .put("/usuario/" + this.editedItem.codigo, {
+              codigo: this.editedItem.codigo,
               nome: this.editedItem.nome,
               senha: this.editedItem.senha,
               email: this.editedItem.email,
               setor: this.editedItem.setor,
+              perguntasecreta: this.editedItem.perguntasecreta,
+              respostasecreta: this.editedItem.resposta,
               ativo: this.editedItem.ativo
             })
             .then(response => {
@@ -377,10 +380,13 @@ export default {
         if (this.$validator.validateAll()) {
           axios
             .post("/usuario", {
+              codigo: this.editedItem.codigo,
               nome: this.editedItem.nome,
               senha: this.editedItem.senha,
               email: this.editedItem.email,
               setor: this.editedItem.setor,
+              perguntasecreta: this.editedItem.perguntasecreta,
+              respostasecreta: this.editedItem.resposta,
               ativo: this.editedItem.ativo
             })
             .then(response => {
