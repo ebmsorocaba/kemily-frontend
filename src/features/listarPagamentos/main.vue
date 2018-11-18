@@ -12,6 +12,7 @@
       </v-card-title>
  
       <v-data-table
+        ref="table"
         :headers="headers"
         :items="pagamentos"
         :search="search"
@@ -70,7 +71,7 @@
                   right
                   absolute
                   color="green lighten"
-          ><v-icon dark>person_add</v-icon></v-btn>
+          ><v-icon dark>add</v-icon></v-btn>
 
           <v-card>
             <v-card-title>
@@ -84,30 +85,29 @@
                   <v-layout wrap>
                
                 <v-flex xs12>
-                  <v-autocomplete
+                  <v-text-field 
                     v-validate="'required|alpha_num'"
+                    mask="###.###.###-##"
                     v-model="editedItem.formaPgto.associado.cpf"
                     :error-messages="errors.collect('cpf')"
                     label="CPF"
-                    :items="editedItem"
-                    :filter="customFilter"
                     data-vv-name="cpf"
-                    item-text="cpf"
                     required
-                  ></v-autocomplete>
+                  ></v-text-field>
                 </v-flex>
-
+<!--
                 <v-flex xs12>
                   <v-text-field 
-                    v-validate="'required'"
+                    v-validate="'required|alpha_spaces'"
                     v-model="editedItem.formaPgto.associado.nome"
                     :error-messages="errors.collect('nome')"
                     label="Nome"
                     data-vv-name="nome"
+                    disabled
                     required
                   ></v-text-field>
                 </v-flex>
-
+-->
                 <v-flex xs12>
                   <v-text-field
                     v-validate="'required|decimal'"
@@ -121,11 +121,13 @@
 
                 <v-flex xs12>
                   <v-text-field
-                    v-validate="'required|date_format:DD/MM/YYYY'"
+                    type="date"
+                    dont-fill-mask-blanks
+                    v-validate="'required'"
                     v-model="editedItem.dataPgto"
                     :error-messages="errors.collect('dataPgto')"
                     label="Data de Pgto"
-                    data-vv-name="dataPgto"
+                    data-vv-name="dataPgto"         
                     required
                   ></v-text-field>
                 </v-flex>
@@ -144,7 +146,9 @@
 
                 <v-flex xs12>
                   <v-text-field
-                    v-validate="'required|date_format:DD/MM/YYYY'"
+                    type="date"
+                    dont-fill-mask-blanks
+                    v-validate="'required'"
                     v-model="editedItem.vencimento"
                     :error-messages="errors.collect('vencimento')"
                     label="Vencimento"
@@ -166,6 +170,37 @@
         </v-dialog>
 
   </v-card>
+
+  <v-snackbar
+      v-model="hasSaved"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O pagamento foi cadastrado com sucesso!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasEdited"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      As alterações do pagamento foram salvas!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasDeleted"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O pagamentos foi excluido!
+    </v-snackbar>
+
   </div>
 </template>
 
@@ -180,6 +215,9 @@ export default {
 
   data: () => ({
     search: "",
+    hasSaved: false,
+    hasEdited: false,
+    hasDeleted: false,
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
@@ -237,6 +275,34 @@ export default {
       valorPago: "",
       dataPgto: ""
     },
+    dictionary: {
+      attributes: {},
+      custom: {
+        cpf: {
+          required: () => "Informe o cpf do Associado!",
+          alpha_num: "Informe um CPF valido!"
+        },
+        nome: {
+          required: () => "O Associado não foi encontrado!",
+          alpha_spaces: "Nome invalido!"
+        },
+        valorPago: {
+          required: () => "Informe o valor do pagamento!",
+          decimal: () => "Informe um valor valido!"
+        },
+        dataPgto: {
+          required: () => "Informe a data do Pagamento!",
+          date_format: () => "A data deve estar no formato DD/MM/YYYY!"
+        },
+        formaPagamento: {
+          required: () => "Selecione a forma do Pagamento!"
+        },
+        vencimento: {
+          required: () => "Informe a data do Vencimento!",
+          date_format: () => "A data deve estar no formato DD/MM/YYYY!"
+        }
+      }
+    },
     formasPgto: ["Dinheiro", "Cartão", "Boleto"]
   }),
 
@@ -258,10 +324,10 @@ export default {
     isCompleted() {
       return (
         this.editedItem.valorPago &&
-        this.editedItem.dataPgto &&
-        this.editedItem.formaPgto.associado.cpf &&
-        this.editedItem.formaPgto.associado.nome &&
-        this.editedItem.vencimento
+        // this.editedItem.dataPgto &&
+        this.editedItem.formaPgto.associado.cpf
+        // this.editedItem.formaPgto.associado.nome &&
+        //this.editedItem.vencimento
       );
     }
   },
@@ -313,14 +379,15 @@ export default {
 
     deleteItem(item) {
       const index = this.pagamentos.indexOf(item);
-      confirm("Você realmente deseja excluir este item?") &&
-        this.pagamentos.splice(index, 1);
 
-      console.log("Delete - Pagamento");
-      axios.delete("/pagamento/" + item.id).then(response => {
-        console.log(response);
-        this.load();
-      });
+      if (confirm("Você realmente deseja excluir este item?")) {
+        console.log("Delete - Pagamento");
+        axios.delete("/pagamento/" + item.id).then(response => {
+          console.log(response);
+          this.load();
+          this.hasDeleted = true;
+        });
+      }
     },
 
     close() {
@@ -334,7 +401,7 @@ export default {
     validateBeforeSubmit() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          alert("From Submitted!");
+          // alert("Form Submitted!");
           return;
         }
       });
@@ -343,9 +410,7 @@ export default {
     customFilter(item, queryText, itemText) {
       const textOne = item.formaPgto.associado.nome.toLowerCase();
       const searchText = queryText.toLowerCase();
-      return (
-        textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
-      );
+      return textOne.indexOf(searchText) > -1;
     },
 
     save() {
@@ -362,6 +427,8 @@ export default {
           })
           .then(response => {
             console.log(response);
+            this.hasEdited = true;
+            this.load();
           });
 
         Object.assign(this.pagamentos[this.editedIndex], this.editedItem);
@@ -383,8 +450,10 @@ export default {
           })
           .then(response => {
             console.log(response);
+            this.hasSaved = true;
+            this.load();
           });
-        console.log(this.editedItem.formaPgto.associado.cpf);
+
         this.pagamentos.push(this.editedItem);
       }
       this.load();
@@ -392,12 +461,12 @@ export default {
     },
 
     limparCampos() {
-      (this.editedItem.cpf_associado = ""),
-        // (this.editedItem.formaPgto.associado.nome = ""),
+      (this.editedItem.formaPgto.associado.cpf = ""),
+        (this.editedItem.formaPgto.associado.nome = ""),
         (this.editedItem.valorPago = ""),
         (this.editedItem.vencimento = ""),
         (this.editedItem.id = ""),
-        (this.editedItem.formaPgto = "Dinheiro"),
+        (this.editedItem.formaPgto.formaPagamento = "Dinheiro"),
         (this.editedItem.dataPgto = ""),
         this.$validator.reset();
     }
