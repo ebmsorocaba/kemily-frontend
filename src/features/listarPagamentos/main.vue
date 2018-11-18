@@ -7,7 +7,6 @@
           append-icon="search"
           label="Pesquisar ..."
           single-line
-          background-color="green lighten-4"
           hide-details
         ></v-text-field>
       </v-card-title>
@@ -18,20 +17,19 @@
         :search="search"
         :pagination.sync="pagination"
         hide-actions
-        class="elevation-10"
+        class="elevation-3"
       >
 
         <template slot="items" slot-scope="props">
+        <td class="text-xs-left">{{ props.item.dataPgto }}</td>
         <td class="text-xs-left">{{ props.item.formaPgto.associado.cpf }}</td>
         <td class="text-xs-left">{{ props.item.formaPgto.associado.nome }}</td>
         <td class="text-xs-left">{{ props.item.valorPago }}</td>
-        <td class="text-xs-left">{{ props.item.dataPgto }}</td>
         <td class="text-xs-left">{{ props.item.formaPgto.formaPagamento }}</td>
         <td class="text-xs-left">{{ props.item.vencimento }}</td>
         <td class="justify-left">
             <v-icon
               small
-              color="blue"
               class="mr-2"
               @click="editItem(props.item)"
             >
@@ -39,7 +37,6 @@
             </v-icon>
             <v-icon
               small
-              color="red"
               @click="deleteItem(props.item)"
             >
               delete
@@ -48,13 +45,13 @@
         </template>
 
         <template slot="no-data">
-          <v-alert :value="true" color="error" icon="warning">
+          <v-alert :value="true" color="grey" icon="warning">
               Não foi possível efetuar a comunicação com o servidor.
               <v-btn color="white" @click="initialize">Atualizar</v-btn>
           </v-alert>
         </template>
 
-        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+        <v-alert slot="no-results" :value="true" color="grey" icon="warning">
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
         </v-alert>
       </v-data-table>
@@ -79,41 +76,92 @@
             <v-card-title>
               <span class="headline">{{ formTitle }}</span>
             </v-card-title>
-            <v-form ref="form" v-model="valid" lazy-validation>
+
+            <!--Inicio do form de cadastros/alteracoes -->
+            <form @submit.prevent="validadeBeforeSubmit" novalidate>
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
                
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.formaPgto.associado.cpf" label="CPF"></v-text-field>
+                  <v-autocomplete
+                    v-validate="'required|alpha_num'"
+                    v-model="editedItem.formaPgto.associado.cpf"
+                    :error-messages="errors.collect('cpf')"
+                    label="CPF"
+                    :items="editedItem"
+                    :filter="customFilter"
+                    data-vv-name="cpf"
+                    item-text="cpf"
+                    required
+                  ></v-autocomplete>
                 </v-flex>
-                <!--
+
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.formaPgto.associado.nome" label="Nome"></v-text-field>
+                  <v-text-field 
+                    v-validate="'required'"
+                    v-model="editedItem.formaPgto.associado.nome"
+                    :error-messages="errors.collect('nome')"
+                    label="Nome"
+                    data-vv-name="nome"
+                    required
+                  ></v-text-field>
                 </v-flex>
-                -->
+
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.valorPago" label="Valor Pago"></v-text-field>
+                  <v-text-field
+                    v-validate="'required|decimal'"
+                    v-model="editedItem.valorPago"
+                    :error-messages="errors.collect('valorPago')"
+                    label="Valor Pago"
+                    data-vv-name="valorPago"
+                    required
+                  ></v-text-field>
                 </v-flex>
+
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.dataPgto" label="Data de Pgto"></v-text-field>
+                  <v-text-field
+                    v-validate="'required|date_format:DD/MM/YYYY'"
+                    v-model="editedItem.dataPgto"
+                    :error-messages="errors.collect('dataPgto')"
+                    label="Data de Pgto"
+                    data-vv-name="dataPgto"
+                    required
+                  ></v-text-field>
                 </v-flex>
+
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.formaPgto.formaPagamento" label="Forma de Pgto"></v-text-field>
+                  <v-select
+                    v-validate="'required'"
+                    :items="formasPgto"
+                    v-model="editedItem.formaPgto.formaPagamento"
+                    :error-messages="errors.collect('formaPagamento')"
+                    label="Forma de Pgto"
+                    data-vv-name="formaPagamento"
+                    required
+                  ></v-select>
                 </v-flex>
+
                 <v-flex xs12>
-                  <v-text-field v-model="editedItem.vencimento" label="Vencimento"></v-text-field>
+                  <v-text-field
+                    v-validate="'required|date_format:DD/MM/YYYY'"
+                    v-model="editedItem.vencimento"
+                    :error-messages="errors.collect('vencimento')"
+                    label="Vencimento"
+                    data-vv-name="vencimento"
+                    required
+                  ></v-text-field>
                 </v-flex>
+                  
                   </v-layout>
                 </v-container>
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Salvar</v-btn>
-              <v-btn color="yellow lighten-3" @click.native="limparCampos">Limpar</v-btn>
-              <v-btn color="red darken-3" @click.native="close">Cancelar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="errors.any() || !isCompleted">Salvar</v-btn>
+              <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
-            </v-form>
+            </form>
           </v-card>
         </v-dialog>
 
@@ -126,27 +174,33 @@ import API from "@/http/API";
 import axios from "@/http/http-common";
 
 export default {
+  $_veeValidate: {
+    validator: "new"
+  },
+
   data: () => ({
     search: "",
-    valid: true,
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
-      sortBy: "nome"
+      sortBy: "dataPgto"
     },
     dialog: false,
     headers: [
+      { text: "Data de Pgto", value: "dataPgto", sortable: false },
       {
         text: "CPF",
         align: "left",
         sortable: false,
-        value: "formaPgto.associado.cpf",
-        visible: false
-
+        value: "props.item.formaPgto.associado.cpf"
       },
-      { text: "Nome", value: "formaPgto.associado.nome", sortable: false },
+
+      {
+        text: "Nome",
+        value: "formaPgto.item.formaPgto.associado.nome",
+        sortable: false
+      },
       { text: "Valor Pago", value: "valorPago", sortable: false },
-      { text: "Data de Pgto", value: "dataPgto", sortable: false },
       { text: "Forma de Pgto", value: "formaPgto.", sortable: false },
       { text: "Vencimento", value: "vencimento", sortable: false },
       { text: "Opções", value: "Opções", sortable: false }
@@ -154,44 +208,62 @@ export default {
     pagamentos: [],
     editedIndex: -1,
     editedItem: {
-      valorPago: "",
-      dataPgto: "",
       formaPgto: {
         associado: {
           cpf: "",
-          //nome: ""
+          nome: "",
+          celular: "",
+          email: "",
+          valorAtual: "",
+          vencAtual: ""
         },
-        formaPagamento: "",
+        formaPagamento: ""
       },
-      
-      vencimento: ""
+      valorPago: "",
+      dataPgto: ""
     },
-    defaultItem: { 
-      valorPago: "",
-      dataPgto: "",
+    defaultItem: {
       formaPgto: {
         associado: {
           cpf: "",
-          //nome: ""
+          nome: "",
+          celular: "",
+          email: "",
+          valorAtual: "",
+          vencAtual: ""
         },
-        formaPagamento: "",
+        formaPagamento: ""
       },
-      
-      vencimento: ""
-    }
+      valorPago: "",
+      dataPgto: ""
+    },
+    formasPgto: ["Dinheiro", "Cartão", "Boleto"]
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Novo Pagamento" : "Editar Pagamento";
     },
-    pages () {
-        if (this.pagination.rowsPerPage == null ||
-          this.pagination.totalItems == null
-        ) return 0
+    pages() {
+      if (
+        this.pagination.rowsPerPage == null ||
+        this.pagination.totalItems == null
+      )
+        return 0;
 
-        return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
-      },
+      return Math.ceil(
+        this.pagination.totalItems / this.pagination.rowsPerPage
+      );
+    },
+    isCompleted() {
+      return (
+        this.editedItem.valorPago &&
+        this.editedItem.dataPgto &&
+        this.editedItem.formaPgto.associado.cpf &&
+        this.editedItem.formaPgto.associado.nome &&
+        this.editedItem.vencimento
+      );
+    }
   },
 
   watch: {
@@ -201,8 +273,8 @@ export default {
 
     pagamentos() {
       this.$nextTick(() => {
-        this.pagination.totalItems = this.pagamentos.length
-      })
+        this.pagination.totalItems = this.pagamentos.length;
+      });
     }
   },
 
@@ -210,10 +282,14 @@ export default {
     this.initialize();
   },
 
+  mounted() {
+    this.$validator.localize("pt", this.dictionary);
+  },
+
   methods: {
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));
-       this.pagination.totalItems = this.pagamentos.length;
+      this.pagination.totalItems = this.pagamentos.length;
     },
 
     changeSort(column) {
@@ -243,6 +319,7 @@ export default {
       console.log("Delete - Pagamento");
       axios.delete("/pagamento/" + item.id).then(response => {
         console.log(response);
+        this.load();
       });
     },
 
@@ -253,10 +330,26 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-    
+
+    validateBeforeSubmit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          alert("From Submitted!");
+          return;
+        }
+      });
+    },
+
+    customFilter(item, queryText, itemText) {
+      const textOne = item.formaPgto.associado.nome.toLowerCase();
+      const searchText = queryText.toLowerCase();
+      return (
+        textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
+      );
+    },
+
     save() {
       if (this.editedIndex > -1) {
-        
         console.log("Edit - Pagamento");
 
         axios
@@ -265,16 +358,13 @@ export default {
             valorPago: this.editedItem.valorPago,
             vencimento: this.editedItem.vencimento,
             dataPgto: this.editedItem.dataPgto,
-            formaPgto: this.editedItem.formaPgto    
-                   
+            formaPgto: this.editedItem.formaPgto
           })
           .then(response => {
-              console.log(response);
+            console.log(response);
           });
-        
+
         Object.assign(this.pagamentos[this.editedIndex], this.editedItem);
-        
-        
       } else {
         console.log("Create - Pagamento");
         console.log(this.editedItem.formaPgto.formaPagamento);
@@ -284,12 +374,12 @@ export default {
             vencimento: this.editedItem.vencimento,
             dataPgto: this.editedItem.dataPgto,
             formaPgto: {
-                associado: {
-                    cpf: this.editedItem.formaPgto.associado.cpf
-                },
-                formaPagamento: this.editedItem.formaPgto.formaPagamento,
-                atual: "true"
-            }         
+              associado: {
+                cpf: this.editedItem.formaPgto.associado.cpf
+              },
+              formaPagamento: this.editedItem.formaPgto.formaPagamento,
+              atual: "true"
+            }
           })
           .then(response => {
             console.log(response);
@@ -297,17 +387,19 @@ export default {
         console.log(this.editedItem.formaPgto.associado.cpf);
         this.pagamentos.push(this.editedItem);
       }
+      this.load();
       this.close();
     },
 
     limparCampos() {
-      (this.editedItem.formaPgto.associado.cpf = ""),
-      (this.editedItem.formaPgto.associado.nome = ""),
-      (this.editedItem.valorPago = ""),
-      (this.editedItem.vencimento = ""),
-      (this.editedItem.id = ""),
-      (this.editedItem.formaPgto = ""),
-      (this.editedItem.dataPgto = "");
+      (this.editedItem.cpf_associado = ""),
+        // (this.editedItem.formaPgto.associado.nome = ""),
+        (this.editedItem.valorPago = ""),
+        (this.editedItem.vencimento = ""),
+        (this.editedItem.id = ""),
+        (this.editedItem.formaPgto = "Dinheiro"),
+        (this.editedItem.dataPgto = ""),
+        this.$validator.reset();
     }
   }
 };

@@ -170,8 +170,36 @@
           </form>
         </v-card>
       </v-dialog>
-
   </v-card>
+  <v-snackbar
+      v-model="hasSaved"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O usuário foi cadastrado com sucesso!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasEdited"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      As alterações do usuário foram salvas!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasDeleted"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O usuário foi excluido!
+    </v-snackbar>
   </div>
 </template>
 
@@ -187,6 +215,9 @@ export default {
   data: () => ({
     search: "",
     exibirSenha: false,
+    hasSaved: false,
+    hasEdited: false,
+    hasDeleted: false,
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
@@ -315,6 +346,14 @@ export default {
   methods: {
     load() {
       API.getUsuarios().then(usuarios => (this.usuarios = usuarios));
+      /*
+      if ((this.usuarios.ativo.text = true)) {
+        this.usuarios.ativo = "Ativo";
+      } else {
+        this.usuarios.ativo = "Inativo";
+      }
+      */
+
       this.pagination.totalItems = this.usuarios.length;
       console.log("total items: " + this.pagination.totalItems);
       console.log("lenght: " + this.usuarios.length);
@@ -340,14 +379,14 @@ export default {
 
     deleteItem(item) {
       const index = this.usuarios.indexOf(item);
-      confirm("Você deseja apagar o usuário selecionado?") &&
-        this.usuarios.splice(index, 1);
-
-      console.log("Delete - Usuario");
-      axios.delete("/usuario/" + item.codigo).then(response => {
-        console.log(response);
-        //this.pagination.hotUpdate;
-      });
+      if (confirm("Você deseja apagar o usuário selecionado?")) {
+        console.log("Delete - Usuario");
+        axios.delete("/usuario/" + item.codigo).then(response => {
+          console.log(response);
+          this.load();
+          this.hasDeleted = true;
+        });
+      }
     },
 
     close() {
@@ -372,12 +411,8 @@ export default {
 
       if (this.editedIndex > -1 && this.$validator.validateAll()) {
         console.log("Edit - Usuario");
-        console.log(this.$validator.validateAll());
 
         if (this.$validator.validateAll()) {
-          console.log(
-            "alterar| validador retornou: " + this.$validator.validateAll()
-          );
           axios
             .put("/usuario/" + this.editedItem.codigo, {
               codigo: this.editedItem.codigo,
@@ -394,6 +429,8 @@ export default {
               console.log(
                 "alterar| validador retornou: " + this.$validator.validateAll()
               );
+              this.hasEdited = true;
+              this.load();
             });
         }
 
@@ -402,9 +439,6 @@ export default {
         console.log("Create - Usuario");
 
         if (this.$validator.validateAll()) {
-          console.log(
-            "salvar| validador retornou: " + this.$validator.validateAll()
-          );
           axios
             .post("/usuario", {
               codigo: this.editedItem.codigo,
@@ -418,13 +452,15 @@ export default {
             })
             .then(response => {
               console.log(response);
+              this.hasSaved = true;
+              this.load();
             });
         }
 
         this.usuarios.push(this.editedItem);
       }
-      //this.$validator.reset()
       this.close();
+      this.load();
     },
 
     limparCampos() {
@@ -437,8 +473,16 @@ export default {
         (this.editedItem.email = ""),
         (this.editedItem.setor = "Administração"),
         (this.editedItem.ativo = false),
+        (this.hasSaved = false),
         this.$validator.reset();
     }
+    /*
+    formatarAtivo() {
+      if (this.editedItem.ativo == true){
+
+      }
+    }
+*/
   }
 };
 </script>
