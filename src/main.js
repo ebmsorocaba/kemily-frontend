@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import store from './store'
+import VueTheMask from 'vue-the-mask'
 import {
   sync
 } from 'vuex-router-sync'
@@ -20,6 +21,8 @@ import Appbar from './components/app-bar'
 import Appfooter from './components/app-footer'
 
 Vue.config.productionTip = false
+
+Vue.use(VueTheMask)
 
 // Polyfills
 global.URLSearchParams = URLSearchParams
