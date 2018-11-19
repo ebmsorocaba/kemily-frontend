@@ -345,11 +345,19 @@ export default {
 
   methods: {
     load() {
+      API.getUsuarios().then(usuarios => (this.usuarios = usuarios));
+      /*
+      if ((this.usuarios.ativo.text = true)) {
+        this.usuarios.ativo = "Ativo";
+      } else {
+        this.usuarios.ativo = "Inativo";
+      }
+      */
+
       this.pagination.totalItems = this.usuarios.length;
       console.log("total items: " + this.pagination.totalItems);
       console.log("lenght: " + this.usuarios.length);
     },
-
     changeSort(column) {
       if (this.pagination.sortBy === column) {
         this.pagination.descending = !this.pagination.descending;
@@ -392,7 +400,7 @@ export default {
     validateBeforeSubmit() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          // alert("Form Submitted!");
+          alert("From Submitted!");
           return;
         }
       });
@@ -418,6 +426,9 @@ export default {
             })
             .then(response => {
               console.log(response);
+              console.log(
+                "alterar| validador retornou: " + this.$validator.validateAll()
+              );
               this.hasEdited = true;
               this.load();
             });
@@ -465,6 +476,13 @@ export default {
         (this.hasSaved = false),
         this.$validator.reset();
     }
+    /*
+    formatarAtivo() {
+      if (this.editedItem.ativo == true){
+
+      }
+    }
+*/
   }
 };
 </script>
