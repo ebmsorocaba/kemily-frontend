@@ -25,7 +25,7 @@
         <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
         <td class="text-xs-left">{{ props.item.associado.cpf }}</td>
         <td class="text-xs-left">{{ props.item.associado.nome }}</td>
-        <td class="text-xs-left">{{ props.item.valorPago }}</td>
+        <td class="text-xs-left">{{ fixNumber(props.item.valorPago) }}</td>
         <td class="text-xs-left">{{ props.item.formapgto }}</td>
         <td class="justify-left">
             <v-icon
@@ -329,6 +329,9 @@ export default {
   methods: {
     formatDate(date) {
       return moment(date).format("DD/MM/YYYY")
+    },
+    fixNumber(number) {
+      return number.toFixed(2);
     },
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));
