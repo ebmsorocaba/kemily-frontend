@@ -22,7 +22,7 @@
       >
 
         <template slot="items" slot-scope="props">
-        <td class="text-xs-left">{{ props.item.dataPgto }}</td>
+        <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
         <td class="text-xs-left">{{ props.item.associado.cpf }}</td>
         <td class="text-xs-left">{{ props.item.associado.nome }}</td>
         <td class="text-xs-left">{{ props.item.valorPago }}</td>
@@ -191,6 +191,7 @@
 <script>
 import API from "@/http/API";
 import axios from "@/http/http-common";
+import moment from "moment";
 
 export default {
   $_veeValidate: {
@@ -326,6 +327,9 @@ export default {
   },
 
   methods: {
+    formatDate(date) {
+      return moment(date).format("DD/MM/YYYY")
+    },
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));
       this.pagination.totalItems = this.pagamentos.length;
