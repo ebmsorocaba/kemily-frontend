@@ -328,10 +328,10 @@ export default {
 
   methods: {
     formatDate(date) {
-      return moment(date).format("DD/MM/YYYY")
+      return moment(date).format("DD/MM/YYYY");
     },
     fixNumber(number) {
-      return number.toFixed(2);
+      return "R$ " + number.toFixed(2);
     },
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));

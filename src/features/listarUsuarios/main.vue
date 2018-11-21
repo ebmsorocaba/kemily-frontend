@@ -25,8 +25,8 @@
           <td class="text-xs-left">{{ props.item.setor }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
           <td class="text-xs-left">
-            <v-icon v-if="props.item.ativo" color="success">check_circle</v-icon>
-            <v-icon v-else="props.item.ativo" color="error">cancel</v-icon>
+            <v-icon v-if="props.item.ativo" color="black">check</v-icon>
+            <v-icon v-else="props.item.ativo" color="black">clear</v-icon>
           </td>
           <td class="justify-left">
             <v-icon

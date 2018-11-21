@@ -7,7 +7,6 @@
           append-icon="search"
           label="Pesquisar associados..."
           single-line
-          background-color="green lighten-4"
           hide-details
         ></v-text-field>
       </v-card-title>
@@ -26,12 +25,11 @@
           <td class="text-xs-left">{{ props.item.nome }}</td>
           <td class="text-xs-left">{{ props.item.celular }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
-          <td class="text-xs-left">{{ props.item.valorAtual }}</td>
-          <td class="text-xs-left">{{ props.item.vencAtual }}</td>
+          <td class="text-xs-left">{{ fixNumber(props.item.valorAtual) }}</td>
+          <td class="text-xs-center">{{ formatDate(props.item.vencAtual) }}</td>
           <td class="justify-left">
             <v-icon
               small
-              color="blue"
               class="mr-2"
               @click="editItem(props.item)"
             >
@@ -39,7 +37,6 @@
             </v-icon>
             <v-icon
               small
-              color="red"
               @click="deleteItem(props.item)"
             >
               delete
@@ -48,13 +45,13 @@
         </template>
 
         <template slot="no-data">
-          <v-alert :value="true" color="error" icon="warning">
+          <v-alert :value="true" color="grey" icon="warning">
               Não foi possível efetuar a comunicação com o servidor.
               <v-btn color="white" @click="initialize">Atualizar</v-btn>
           </v-alert>
         </template>
 
-        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+        <v-alert slot="no-results" :value="true" color="grey" icon="warning">
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
         </v-alert>
       </v-data-table>
@@ -79,27 +76,79 @@
             <v-card-title>
               <span class="headline">{{ formTitle }}</span>
             </v-card-title>
-            <v-form ref="form" v-model="valid" lazy-validation>
+
+            <!--Inicio do form de cadastros/alteracoes -->
+            <v-form @submit.prevent="validadeBeforeSubmit" novalidate>
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.cpf" label="CPF" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|alpha_num'"
+                        mask="###.###.###-##"
+                        v-model="editedItem.cpf"
+                        :error-messages="errors.collect('cpf')"
+                        label="CPF"
+                        data-vv-name="cpf"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.nome" label="Nome" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|min:4|alpha_spaces'"
+                        v-model="editedItem.nome"
+                        :error-messages="errors.collect('nome')"
+                        label="Nome"
+                        data-vv-name="nome"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.celular" label="Celular" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|numeric'"
+                        mask="(##) #####-####" 
+                        v-model="editedItem.celular"
+                        :error-messages="errors.collect('celular')"
+                        label="Celular"
+                        data-vv-name="celular"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.email" label="E-Mail" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|email'"
+                        v-model="editedItem.email"
+                        :error-messages="errors.collect('email')"
+                        label="E-Mail"
+                        data-vv-name="email"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.valorAtual" label="Valor" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|decimal'" 
+                        v-model="editedItem.valorAtual"
+                        :error-messages="errors.collect('valorAtual')"
+                        label="Valor"
+                        data-vv-name="valorAtual"
+                        required
+                      ></v-text-field>
                     </v-flex>
+
                     <v-flex xs12>
-                      <v-text-field v-model="editedItem.vencAtual" label="Vencimento" required></v-text-field>
+                      <v-text-field
+                        v-validate="'required|numeric'" 
+                        v-model="editedItem.vencAtual"
+                        :error-messages="errors.collect('vencAtual')"
+                        label="Vencimento"
+                        data-vv-name="vencAtual"
+                        required
+                      ></v-text-field>
                     </v-flex>
                    
                   </v-layout>
@@ -107,26 +156,61 @@
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="blue lighten" @click.native="save" :disabled="!valid">Salvar</v-btn>
-              <v-btn color="yellow lighten-3" @click.native="limparCampos">Limpar</v-btn>
-              <v-btn color="red darken-3" @click.native="close">Cancelar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="errors.any() || !isCompleted">Salvar</v-btn>
+              <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
             </v-form>
           </v-card>
         </v-dialog>
 
   </v-card>
+  <v-snackbar
+      v-model="hasSaved"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O associado foi cadastrado com sucesso!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasEdited"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      As alterações do associado foram salvas!
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="hasDeleted"
+      :timeout="4000"
+      absolute
+      bottom
+      center
+    >
+      O associado foi excluido!
+    </v-snackbar>
   </div>
 </template>
 
 <script>
 import API from "@/http/API";
 import axios from "@/http/http-common";
+import moment from "moment";
 
 export default {
+  $_veeValidate: {
+    validator: "new"
+  },
+
   data: () => ({
     search: "",
-    valid: true,
+    hasSaved: false,
+    hasEdited: false,
+    hasDeleted: false,
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
@@ -150,18 +234,50 @@ export default {
     associados: [],
     editedIndex: -1,
     editedItem: {
+      cpf: "",
       nome: "",
       celular: "",
       email: "",
-      valorAtual: 0,
-      vencAtual: 0
+      valorAtual: "",
+      vencAtual: ""
     },
     defaultItem: {
+      cpf: "",
       nome: "",
       celular: "",
       email: "",
-      valorAtual: 0,
-      vencAtual: 0
+      valorAtual: "",
+      vencAtual: ""
+    },
+    dictionary: {
+      attributes: {},
+      custom: {
+        nome: {
+          required: () => "Informe o nome do associado!",
+          min: () => "O nome do associado deve conter no minimo 4 caracteres!",
+          alpha_spaces: () => "Informe um nome valido!"
+        },
+        cpf: {
+          required: () => "Informe o CPF do associado!",
+          alpha_num: () => "Informe um CPF valido!"
+        },
+        email: {
+          required: () => "Informe o e-mail do associado!",
+          email: () => "Informe um e-mail valido! Exemplo: teste@teste.com"
+        },
+        celular: {
+          required: () => "Informe o celular do associado!",
+          numeric: () => "Informe um numero de telefone valido!"
+        },
+        valorAtual: {
+          required: () => "Informe o valor do pagamento!",
+          decimal: () => "Informe um valor valido!"
+        },
+        vencAtual: {
+          required: () => "Selecione o dia do vencimento do pagamento",
+          numeric: () => "Informe uma data de vencimento valida!"
+        }
+      }
     }
   }),
 
@@ -178,6 +294,16 @@ export default {
 
       return Math.ceil(
         this.pagination.totalItems / this.pagination.rowsPerPage
+      );
+    },
+    isCompleted() {
+      return (
+        this.editedItem.nome &&
+        this.editedItem.cpf &&
+        this.editedItem.email &&
+        this.editedItem.vencAtual &&
+        this.editedItem.valorAtual &&
+        this.editedItem.celular
       );
     }
   },
@@ -198,7 +324,19 @@ export default {
     this.initialize();
   },
 
+  mounted() {
+    this.$validator.localize("pt", this.dictionary);
+  },
+
   methods: {
+    formatDate(date) {
+      return moment(date).format("DD");
+    },
+
+    fixNumber(number) {
+      return "R$ " + number.toFixed(2);
+    },
+
     load() {
       API.getAssociados().then(associados => (this.associados = associados));
       this.pagination.totalItems = this.associados.length;
@@ -225,13 +363,15 @@ export default {
 
     deleteItem(item) {
       const index = this.associados.indexOf(item);
-      confirm("Você realmente deseja excluir este item?") &&
-        this.associados.splice(index, 1);
 
-      console.log("Delete - Associado");
-      axios.delete("/associado/" + item.cpf).then(response => {
-        console.log(response);
-      });
+      if (confirm("Você realmente deseja excluir este item?")) {
+        console.log("Delete - Associado");
+        axios.delete("/associado/" + item.cpf).then(response => {
+          console.log(response);
+          this.load();
+          this.hasDeleted = true;
+        });
+      }
     },
 
     close() {
@@ -240,6 +380,15 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
+    },
+
+    validateBeforeSubmit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          // alert("Form Submitted!");
+          return;
+        }
+      });
     },
 
     save() {
@@ -257,6 +406,8 @@ export default {
           })
           .then(response => {
             console.log(response);
+            this.hasEdited = true;
+            this.load();
           });
 
         Object.assign(this.associados[this.editedIndex], this.editedItem);
@@ -274,19 +425,24 @@ export default {
           })
           .then(response => {
             console.log(response);
+            this.hasSaved = true;
+            this.load();
           });
 
         this.associados.push(this.editedItem);
       }
+      this.load();
       this.close();
     },
+
     limparCampos() {
       (this.editedItem.cpf = ""),
         (this.editedItem.nome = ""),
         (this.editedItem.celular = ""),
         (this.editedItem.email = ""),
         (this.editedItem.valorAtual = ""),
-        (this.editedItem.vencAtual = "");
+        (this.editedItem.vencAtual = ""),
+        this.$validator.reset();
     }
   }
 };
