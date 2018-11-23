@@ -21,11 +21,11 @@
       >
 
         <template slot="items" slot-scope="props">
-          <td>{{ props.item.cpf }}</td>
+          <td>{{ formatCPF(props.item.cpf) }}</td>
           <td class="text-xs-left">{{ props.item.nome }}</td>
-          <td class="text-xs-left">{{ props.item.celular }}</td>
+          <td class="text-xs-left">{{ formatPhone(props.item.celular) }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
-          <td class="text-xs-left">{{ fixNumber(props.item.valorAtual) }}</td>
+          <td class="text-xs-left">{{ fixCurrency(props.item.valorAtual) }}</td>
           <td class="text-xs-center">{{ formatDate(props.item.vencAtual) }}</td>
           <td class="justify-left">
             <v-icon
@@ -333,13 +333,29 @@ export default {
       return moment(date).format("DD");
     },
 
-    fixNumber(number) {
-      return "R$ " + number.toFixed(2);
+    fixCurrency(number) {
+      return number.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    },
+
+    formatCPF(cpf) {
+      cpf = cpf.replace(/[^\d]/g, "");
+
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    },
+
+    formatPhone(telefone) {
+      telefone = telefone.replace(/[^\d]/g, "");
+
+      return telefone.replace(/(\d{0})(\d{2})(\d{0})(\d{5})/, "$1($2)$3 $4-");
     },
 
     load() {
       API.getAssociados().then(associados => (this.associados = associados));
       this.pagination.totalItems = this.associados.length;
+      console.log("retornou " + this.associados);
     },
 
     changeSort(column) {

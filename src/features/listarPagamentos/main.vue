@@ -23,9 +23,9 @@
 
         <template slot="items" slot-scope="props">
         <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
-        <td class="text-xs-left">{{ props.item.associado.cpf }}</td>
+        <td class="text-xs-left">{{ formatCPF(props.item.associado.cpf) }}</td>
         <td class="text-xs-left">{{ props.item.associado.nome }}</td>
-        <td class="text-xs-left">{{ fixNumber(props.item.valorPago) }}</td>
+        <td class="text-xs-left">{{ fixCurrency(props.item.valorPago) }}</td>
         <td class="text-xs-left">{{ props.item.formapgto }}</td>
         <td class="justify-left">
             <v-icon
@@ -82,52 +82,74 @@
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
-               
                 <v-flex xs12>
-                  <v-text-field 
+                  <v-autocomplete
                     v-validate="'required|alpha_num'"
-                    mask="###.###.###-##"
+                    item-text="cpf"
+                    return-object
                     v-model="editedItem.associado.cpf"
-                    :error-messages="errors.collect('cpf')"
+                    :items="associados"
                     label="CPF"
                     data-vv-name="cpf"
                     required
-                  ></v-text-field>
+                  ></v-autocomplete>
                 </v-flex>
 
                 <v-flex xs12>
-                  <v-text-field 
-                    v-model="editedItem.associado.nome"
+                  <v-text-field
+                    v-validate="'required'"
+                    v-model="editedItem.associado.cpf.nome"
                     label="Nome"
                     solo
-                    disabled
+                    readonly
+                    data-vv-name="nome"
                     required
                   ></v-text-field>
                 </v-flex>
 
                 <v-flex xs12>
-                  <v-text-field
-                    v-validate="'required|decimal'"
-                    v-model="editedItem.valorPago"
-                    :error-messages="errors.collect('valorPago')"
-                    label="Valor Pago"
-                    data-vv-name="valorPago"
-                    required
-                  ></v-text-field>
-                </v-flex>
+                    <v-text-field
+                      v-validate="'required|decimal'"
+                      v-model="editedItem.associado.cpf.valorAtual"
+                      :error-messages="errors.collect('valorPago')"
+                      label="Valor Pago"
+                      data-vv-name="valorPago"
+                      required
+                    ></v-text-field>
+                  </v-flex>
 
-                <v-flex xs12>
-                  <v-text-field
-                    type="date"
-                    dont-fill-mask-blanks
-                    v-validate="'required'"
-                    v-model="editedItem.dataPgto"
-                    :error-messages="errors.collect('dataPgto')"
-                    label="Data de Pgto"
-                    data-vv-name="dataPgto"         
-                    required
-                  ></v-text-field>
-                </v-flex>
+                  <v-flex xs12>
+                        <v-dialog
+                          ref="dialog"
+                          v-model="modal"
+                          :return-value.sync="editedItem.dataPgto"
+                          lazy
+                          full-width
+                          width="290px"
+                        >
+                          <v-text-field
+                            v-validate="'required'"
+                            slot="activator"
+                            v-model="editedItem.dataPgto"
+                            :error-messages="errors.collect('dataPgto')"
+                            label="Data do Pagamento"
+                            item-value="pagamento.dataPgto"
+                            data-vv-name="dataPgto"
+                            readonly
+                          ></v-text-field>
+                          <v-date-picker
+                            color="grey"
+                            header-color="grey"
+                            v-model="date"
+                            scrollable
+                            locale="pt-br"
+                          >
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="black" @click="modal = false">Cancelar</v-btn>
+                            <v-btn flat color="black" @click="$refs.dialog.save(editedItem.dataPgto)">OK</v-btn>
+                          </v-date-picker>
+                        </v-dialog>
+                      </v-flex>
 
                 <v-flex xs12>
                   <v-select
@@ -146,7 +168,7 @@
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="errors.any() || !isCompleted">Salvar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save">Salvar</v-btn>
               <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
             </form>
@@ -199,10 +221,13 @@ export default {
   },
 
   data: () => ({
+    date: new Date().toISOString().substr(0, 10),
+    modal: false,
     search: "",
     hasSaved: false,
     hasEdited: false,
     hasDeleted: false,
+
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
@@ -219,13 +244,13 @@ export default {
         text: "CPF",
         align: "left",
         sortable: false,
-        value: "props.item.formaPgto.associado.cpf"
+        value: "associado.cpf"
       },
 
       {
         text: "Nome",
         align: "left",
-        value: "formaPgto.item.formaPgto.associado.nome",
+        value: "associado.nome",
         sortable: false
       },
       { text: "Valor Pago", value: "valorPago", sortable: false },
@@ -233,25 +258,28 @@ export default {
       { text: "Opções", value: "Opções", sortable: false }
     ],
     pagamentos: [],
+    associados: [],
     editedIndex: -1,
     editedItem: {
       id: "",
       valorPago: "",
-      dataPgto: "",
+      dataPgto: new Date().toISOString().substr(0, 10),
       formapgto: "",
       associado: {
         cpf: "",
-        nome: ""
+        nome: "",
+        valorAtual: ""
       }
     },
     defaultItem: {
       id: "",
       valorPago: "",
-      dataPgto: "",
+      dataPgto: new Date().toISOString().substr(0, 10),
       formapgto: "",
       associado: {
         cpf: "",
-        nome: ""
+        nome: "",
+        valorAtual: ""
       }
     },
     dictionary: {
@@ -262,16 +290,14 @@ export default {
           alpha_num: "Informe um CPF valido!"
         },
         nome: {
-          required: () => "O Associado não foi encontrado!",
-          alpha_spaces: "Nome invalido!"
+          required: () => "O Associado não foi encontrado!"
         },
-        valorPago: {
+        valorAtual: {
           required: () => "Informe o valor do pagamento!",
           decimal: () => "Informe um valor valido!"
         },
         dataPgto: {
-          required: () => "Informe a data do Pagamento!",
-          date_format: () => "A data deve estar no formato DD/MM/YYYY!"
+          required: () => "Informe a data do Pagamento!"
         },
         formapgto: {
           required: () => "Selecione a forma do Pagamento!"
@@ -282,6 +308,9 @@ export default {
   }),
 
   computed: {
+    dataPgto() {
+      return this.date ? moment(this.date).format("DD/MM/YYYY") : "";
+    },
     formTitle() {
       return this.editedIndex === -1 ? "Novo Pagamento" : "Editar Pagamento";
     },
@@ -298,9 +327,9 @@ export default {
     },
     isCompleted() {
       return (
-        this.editedItem.valorPago &&
+        this.pagamento.valorPago &&
         // this.editedItem.dataPgto &&
-        this.editedItem.associado.cpf
+        this.pagamento.associado
         // this.editedItem.formaPgto.associado.nome &&
       );
     }
@@ -330,12 +359,28 @@ export default {
     formatDate(date) {
       return moment(date).format("DD/MM/YYYY");
     },
-    fixNumber(number) {
-      return "R$ " + number.toFixed(2);
+
+    fixCurrency(number) {
+      return number.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
     },
+
+    formatCPF(cpf) {
+      cpf = cpf.replace(/[^\d]/g, "");
+
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    },
+
     load() {
       API.getPagamentos().then(pagamentos => (this.pagamentos = pagamentos));
       this.pagination.totalItems = this.pagamentos.length;
+
+      API.getAssociados().then(response => {
+        this.associados = response;
+        console.log("retornou " + this.associados);
+      });
     },
 
     changeSort(column) {
@@ -350,6 +395,8 @@ export default {
     initialize() {
       this.load();
     },
+
+    //this.pagamento = Object.assign({}, ...item);
 
     editItem(item) {
       this.editedIndex = this.pagamentos.indexOf(item);
@@ -395,8 +442,13 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
+        /* 
         console.log("Edit - Pagamento");
-
+        console.log("valor = " + this.pagamento.associado.valorAtual);
+        console.log("data = " + this.pagamento.dataPgto);
+        console.log("forma = " + this.pagamento.formapgto);
+        console.log("cpf = " + this.pagamento.associado.cpf);
+      */
         axios
           .put("/pagamento/" + this.editedItem.id, {
             id: this.editedItem.id,
@@ -413,10 +465,17 @@ export default {
 
         Object.assign(this.pagamentos[this.editedIndex], this.editedItem);
       } else {
+        /*
         console.log("Create - Pagamento");
+        console.log("valor = " + this.pagamento.associado.valorAtual);
+        console.log("data = " + this.dataPgto);
+        console.log("forma = " + this.pagamento.formapgto);
+        console.log("cpf = " + this.pagamento.associado.cpf);
+        */
         axios
           .post("/pagamento", {
-            valorPago: this.editedItem.valorPago,
+            id: this.editedItem.id,
+            valorPago: this.editedItem.associado.valorAtual,
             dataPgto: this.editedItem.dataPgto,
             formapgto: this.editedItem.formapgto,
             cpfassociado: this.editedItem.associado.cpf
