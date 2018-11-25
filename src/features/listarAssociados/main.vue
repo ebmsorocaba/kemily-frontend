@@ -408,8 +408,14 @@ export default {
     },
 
     save() {
+      console.log("Edit - Associado");
+      console.log("cpf =" + this.editedItem.cpf);
+      console.log("vencimento =" + this.editedItem.vencAtual);
+
       if (this.editedIndex > -1) {
         console.log("Edit - Associado");
+        console.log("cpf =" + this.editedItem.cpf);
+        console.log("vencimento =" + this.editedItem.vencAtual);
 
         axios
           .put("/associado/" + this.editedItem.cpf, {
@@ -429,6 +435,8 @@ export default {
         Object.assign(this.associados[this.editedIndex], this.editedItem);
       } else {
         console.log("Create - Associado");
+        console.log("cpf =" + this.editedItem.cpf);
+        console.log("vencimento =" + this.editedItem.vencAtual);
 
         axios
           .post("/associado", {

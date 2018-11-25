@@ -87,7 +87,7 @@
                     v-validate="'required|alpha_num'"
                     item-text="cpf"
                     return-object
-                    v-model="editedItem.associado.cpf"
+                    v-model="editedItem.associado"
                     :items="associados"
                     label="CPF"
                     data-vv-name="cpf"
@@ -98,7 +98,7 @@
                 <v-flex xs12>
                   <v-text-field
                     v-validate="'required'"
-                    v-model="editedItem.associado.cpf.nome"
+                    v-model="editedItem.associado.nome"
                     label="Nome"
                     solo
                     readonly
@@ -110,7 +110,7 @@
                 <v-flex xs12>
                     <v-text-field
                       v-validate="'required|decimal'"
-                      v-model="editedItem.associado.cpf.valorAtual"
+                      v-model="editedItem.associado.valorAtual"
                       :error-messages="errors.collect('valorPago')"
                       label="Valor Pago"
                       data-vv-name="valorPago"
@@ -130,10 +130,9 @@
                           <v-text-field
                             v-validate="'required'"
                             slot="activator"
-                            v-model="editedItem.dataPgto"
+                            v-model="dataPgto"
                             :error-messages="errors.collect('dataPgto')"
                             label="Data do Pagamento"
-                            item-value="pagamento.dataPgto"
                             data-vv-name="dataPgto"
                             readonly
                           ></v-text-field>
@@ -263,7 +262,7 @@ export default {
     editedItem: {
       id: "",
       valorPago: "",
-      dataPgto: new Date().toISOString().substr(0, 10),
+      dataPgto: "",
       formapgto: "",
       associado: {
         cpf: "",
@@ -274,7 +273,7 @@ export default {
     defaultItem: {
       id: "",
       valorPago: "",
-      dataPgto: new Date().toISOString().substr(0, 10),
+      dataPgto: "",
       formapgto: "",
       associado: {
         cpf: "",
@@ -360,6 +359,13 @@ export default {
       return moment(date).format("DD/MM/YYYY");
     },
 
+    formatAxiosDate(date) {
+      if (!date) return null;
+      const [day, month, year] = date.split("/");
+      console.log("axios date: " + year + "-" + month + "-" + day);
+      return `${year}-${month}-${day}`;
+    },
+
     fixCurrency(number) {
       return number.toLocaleString("pt-BR", {
         style: "currency",
@@ -371,6 +377,10 @@ export default {
       cpf = cpf.replace(/[^\d]/g, "");
 
       return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    },
+
+    rmMaskCPF(cpf) {
+      return cpf.replace(/[^\d]/g, "");
     },
 
     load() {
@@ -400,7 +410,7 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.pagamentos.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this.editedItem = Object.assign({}, ...item);
       this.dialog = true;
     },
 
@@ -434,12 +444,6 @@ export default {
       });
     },
 
-    customFilter(item, queryText, itemText) {
-      const textOne = item.associado.cpf.toLowerCase();
-      const searchText = queryText.toLowerCase();
-      return textOne.indexOf(searchText) > -1;
-    },
-
     save() {
       if (this.editedIndex > -1) {
         /* 
@@ -465,20 +469,19 @@ export default {
 
         Object.assign(this.pagamentos[this.editedIndex], this.editedItem);
       } else {
-        /*
         console.log("Create - Pagamento");
-        console.log("valor = " + this.pagamento.associado.valorAtual);
-        console.log("data = " + this.dataPgto);
-        console.log("forma = " + this.pagamento.formapgto);
-        console.log("cpf = " + this.pagamento.associado.cpf);
-        */
+        console.log("valor = " + this.editedItem.associado.valorAtual);
+        console.log("data = " + this.formatAxiosDate(this.editedItem.dataPgto));
+        console.log("forma = " + this.editedItem.formapgto);
+        console.log("cpf = " + this.rmMaskCPF(this.editedItem.associado.cpf));
+
         axios
           .post("/pagamento", {
             id: this.editedItem.id,
-            valorPago: this.editedItem.associado.valorAtual,
-            dataPgto: this.editedItem.dataPgto,
-            formapgto: this.editedItem.formapgto,
-            cpfassociado: this.editedItem.associado.cpf
+            valorPago: "51",
+            dataPgto: this.formatAxiosDate(this.dataPgto),
+            formapgto: "Dinheiro",
+            cpfassociado: this.rmMaskCPF(this.editedItem.associado.cpf)
           })
           .then(response => {
             console.log(response);
@@ -493,9 +496,7 @@ export default {
     },
 
     limparCampos() {
-      (this.editedItem.associado.cpf = ""),
-        (this.editedItem.associado.nome = ""),
-        (this.editedItem.valorPago = ""),
+      (this.editedItem.associado = ""),
         (this.editedItem.id = ""),
         (this.editedItem.formapgto = "Dinheiro"),
         (this.editedItem.dataPgto = ""),
