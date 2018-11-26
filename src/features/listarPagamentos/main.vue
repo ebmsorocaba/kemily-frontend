@@ -108,8 +108,6 @@
                   ></v-text-field>
                 </v-flex>
 
-<pre>{{editedItem}}</pre>
-
                 <v-flex xs12>
                     <v-text-field
                       v-validate="'required|decimal'"
