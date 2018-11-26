@@ -84,6 +84,7 @@
                   <v-layout wrap>
                 <v-flex xs12>
                   <v-autocomplete
+                    id="cmpltAssociado"
                     v-validate="'required|alpha_num'"
                     item-text="cpf"
                     return-object
@@ -95,12 +96,12 @@
                   ></v-autocomplete>
                 </v-flex>
 
+
                 <v-flex xs12>
                   <v-text-field
                     v-validate="'required'"
                     v-model="editedItem.associado.nome"
                     label="Nome"
-                    solo
                     readonly
                     data-vv-name="nome"
                     required
@@ -117,6 +118,20 @@
                       required
                     ></v-text-field>
                   </v-flex>
+
+<!--
+                  <v-flex xs12>
+                    <v-text-field
+                      type="date"
+                      v-validate="'required|date'"
+                      v-model="editedItem.dataPgto"
+                      :error-messages="errors.collect('dataPgto')"
+                      label="Data do Pagamento"
+                      data-vv-name="dataPgto"
+                      required
+                    ></v-text-field>
+                  </v-flex>
+-->
 
                   <v-flex xs12>
                         <v-dialog
@@ -286,12 +301,12 @@ export default {
       custom: {
         cpf: {
           required: () => "Informe o cpf do Associado!",
-          alpha_num: "Informe um CPF valido!"
+          alpha_num: () => "Informe um CPF valido!"
         },
         nome: {
           required: () => "O Associado não foi encontrado!"
         },
-        valorAtual: {
+        valorPago: {
           required: () => "Informe o valor do pagamento!",
           decimal: () => "Informe um valor valido!"
         },
@@ -410,7 +425,12 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.pagamentos.indexOf(item);
-      this.editedItem = Object.assign({}, ...item);
+      //this.editedItem = Object.assign({}, ...item);
+      this.editedItem.associado.cpf = this.rmMaskCPF(item.associado.cpf);
+      this.editedItem.associado.nome = item.associado.nome;
+      this.editedItem.associado.valorAtual = item.valorPago;
+      this.date = item.dataPgto;
+      this.editedItem.formapgto = item.formapgto;
       this.dialog = true;
     },
 
@@ -456,10 +476,10 @@ export default {
         axios
           .put("/pagamento/" + this.editedItem.id, {
             id: this.editedItem.id,
-            valorPago: this.editedItem.valorPago,
-            dataPgto: this.editedItem.dataPgto,
+            valorPago: this.editedItem.associado.valorAtual,
+            dataPgto: this.formatAxiosDate(this.dataPgto),
             formapgto: this.editedItem.formapgto,
-            cpfassociado: this.editedItem.associado.cpf
+            cpfassociado: this.rmMaskCPF(this.editedItem.associado.cpf)
           })
           .then(response => {
             console.log(response);
@@ -478,9 +498,9 @@ export default {
         axios
           .post("/pagamento", {
             id: this.editedItem.id,
-            valorPago: "51",
+            valorPago: this.editedItem.associado.valorAtual,
             dataPgto: this.formatAxiosDate(this.dataPgto),
-            formapgto: "Dinheiro",
+            formapgto: this.editedItem.formapgto,
             cpfassociado: this.rmMaskCPF(this.editedItem.associado.cpf)
           })
           .then(response => {
@@ -497,6 +517,8 @@ export default {
 
     limparCampos() {
       (this.editedItem.associado = ""),
+        (this.editedItem.associado.nome = ""),
+        (this.editedItem.valorAtual = ""),
         (this.editedItem.id = ""),
         (this.editedItem.formapgto = "Dinheiro"),
         (this.editedItem.dataPgto = ""),
