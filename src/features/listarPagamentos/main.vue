@@ -108,6 +108,8 @@
                   ></v-text-field>
                 </v-flex>
 
+<pre>{{editedItem}}</pre>
+
                 <v-flex xs12>
                     <v-text-field
                       v-validate="'required|decimal'"
@@ -182,7 +184,7 @@
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="grey lighten-1" @click.native="save">Salvar</v-btn>
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" >Salvar</v-btn> <!--:disabled="errors.any() || !isCompleted" -->
               <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
             </form>
@@ -282,7 +284,10 @@ export default {
       associado: {
         cpf: "",
         nome: "",
-        valorAtual: ""
+        celular: "",
+        email: "",
+        valorAtual: "",
+        vencAtual: ""
       }
     },
     defaultItem: {
@@ -293,7 +298,10 @@ export default {
       associado: {
         cpf: "",
         nome: "",
-        valorAtual: ""
+        celular: "",
+        email: "",
+        valorAtual: "",
+        vencAtual: ""
       }
     },
     dictionary: {
@@ -341,9 +349,9 @@ export default {
     },
     isCompleted() {
       return (
-        this.pagamento.valorPago &&
+        // this.editedItem.valorPago &&
         // this.editedItem.dataPgto &&
-        this.pagamento.associado
+        this.editedItem.formapgto
         // this.editedItem.formaPgto.associado.nome &&
       );
     }
@@ -425,10 +433,15 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.pagamentos.indexOf(item);
+      this.getAssociadoById(item.associado.cpf).then(response => {
+        this.editedItem.associado = response;
+        this.editedItem.associado.valorAtual = item.valorPago;
+        this.editedItem.associado.nome = item.associado.nome;
+      });
       //this.editedItem = Object.assign({}, ...item);
-      this.editedItem.associado.cpf = this.rmMaskCPF(item.associado.cpf);
-      this.editedItem.associado.nome = item.associado.nome;
-      this.editedItem.associado.valorAtual = item.valorPago;
+      //this.editedItem.associado.cpf = this.rmMaskCPF(item.associado.cpf);
+      //  this.editedItem.associado = this.getAssociadoById(item.associado.cpf);
+      this.editedItem.id = item.id;
       this.date = item.dataPgto;
       this.editedItem.formapgto = item.formapgto;
       this.dialog = true;
@@ -466,13 +479,12 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        /* 
-        console.log("Edit - Pagamento");
-        console.log("valor = " + this.pagamento.associado.valorAtual);
-        console.log("data = " + this.pagamento.dataPgto);
-        console.log("forma = " + this.pagamento.formapgto);
-        console.log("cpf = " + this.pagamento.associado.cpf);
-      */
+        console.log("Create - Pagamento");
+        console.log("valor = " + this.editedItem.associado.valorAtual);
+        console.log("data = " + this.formatAxiosDate(this.editedItem.dataPgto));
+        console.log("forma = " + this.editedItem.formapgto);
+        console.log("cpf = " + this.rmMaskCPF(this.editedItem.associado.cpf));
+
         axios
           .put("/pagamento/" + this.editedItem.id, {
             id: this.editedItem.id,
@@ -523,6 +535,14 @@ export default {
         (this.editedItem.formapgto = "Dinheiro"),
         (this.editedItem.dataPgto = ""),
         this.$validator.reset();
+    },
+
+    getAssociadoById(cpf) {
+      return API.getAssociadoById(this.rmMaskCPF(cpf)).then(response => {
+        console.dir("get by id " + this.associado);
+
+        return response;
+      });
     }
   }
 };
