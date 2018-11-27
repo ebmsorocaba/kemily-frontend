@@ -357,6 +357,10 @@ export default {
       return telefone.replace(/(\d{0})(\d{2})(\d{0})(\d{5})/, "$1($2)$3 $4-");
     },
 
+    rmMaskCPF(cpf) {
+      return cpf.replace(/[^\d]/g, "");
+    },
+
     load() {
       API.getAssociados().then(associados => (this.associados = associados));
       this.pagination.totalItems = this.associados.length;
@@ -387,11 +391,15 @@ export default {
 
       if (confirm("Você realmente deseja excluir este item?")) {
         console.log("Delete - Associado");
-        axios.delete("/associado/" + item.cpf).then(response => {
-          console.log(response);
-          this.load();
-          this.hasDeleted = true;
-        });
+        axios
+          .delete("/associado/" + this.rmMaskCPF(item.cpf))
+          .then(response => {
+            console.log(response);
+            console.log(item);
+            console.log(item.cpf);
+            this.load();
+            this.hasDeleted = true;
+          });
       }
     },
 
