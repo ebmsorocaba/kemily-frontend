@@ -23,7 +23,7 @@
         <template slot="items" slot-scope="props">
           <td>{{ formatCPF(props.item.cpf) }}</td>
           <td class="text-xs-left">{{ props.item.nome }}</td>
-          <td class="text-xs-left">{{ props.item.celular }}</td>
+          <td class="text-xs-left">{{ formatPhone(props.item.celular) }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
           <td class="text-xs-left">{{ fixCurrency(props.item.valorAtual) }}</td>
           <td class="text-xs-center">{{ props.item.vencAtual }}</td>
