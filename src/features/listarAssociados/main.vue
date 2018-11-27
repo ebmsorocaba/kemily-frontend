@@ -85,7 +85,7 @@
 
                     <v-flex xs12>
                       <v-text-field
-                        v-validate="'required|alpha_num'"
+                        v-validate="'required|alpha_num|min:11'"
                         mask="###.###.###-##"
                         v-model="editedItem.cpf"
                         :error-messages="errors.collect('cpf')"
@@ -108,7 +108,7 @@
 
                     <v-flex xs12>
                       <v-text-field
-                        v-validate="'required|numeric'"
+                        v-validate="'required|numeric|min:10'"
                         mask="(##) #####-####" 
                         v-model="editedItem.celular"
                         :error-messages="errors.collect('celular')"
@@ -131,7 +131,7 @@
 
                     <v-flex xs12>
                       <v-text-field
-                        v-validate="'required|decimal'" 
+                        v-validate="'required|decimal|min_value:0.01'" 
                         v-model="editedItem.valorAtual"
                         :error-messages="errors.collect('valorAtual')"
                         label="Valor"
@@ -142,7 +142,7 @@
 
                     <v-flex xs12>
                       <v-text-field
-                        v-validate="'required|numeric'" 
+                        v-validate="'required|numeric|between:1,31'" 
                         v-model="editedItem.vencAtual"
                         :error-messages="errors.collect('vencAtual')"
                         label="Vencimento"
@@ -259,7 +259,8 @@ export default {
         },
         cpf: {
           required: () => "Informe o CPF do associado!",
-          alpha_num: () => "Informe um CPF valido!"
+          alpha_num: () => "Informe um CPF valido!",
+          min: () => "Informe um CPF valido!"
         },
         email: {
           required: () => "Informe o e-mail do associado!",
@@ -267,15 +268,18 @@ export default {
         },
         celular: {
           required: () => "Informe o celular do associado!",
-          numeric: () => "Informe um numero de telefone valido!"
+          numeric: () => "Informe um numero de telefone valido!",
+          min: () => "Informe um numero de telefone valido!"
         },
         valorAtual: {
           required: () => "Informe o valor do pagamento!",
-          decimal: () => "Informe um valor valido!"
+          decimal: () => "Informe um valor valido!",
+          min_value: () => "O valor do pagamento não pode ser negativo ou zero!"
         },
         vencAtual: {
-          required: () => "Selecione o dia do vencimento do pagamento",
-          numeric: () => "Informe uma data de vencimento valida!"
+          required: () => "Informe o dia do vencimento do pagamento",
+          numeric: () => "Informe o dia do vencimento do pagamento!",
+          between: () => "O dia deve estar entre 1 e 31!"
         }
       }
     }

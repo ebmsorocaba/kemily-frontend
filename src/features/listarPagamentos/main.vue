@@ -85,7 +85,7 @@
                 <v-flex xs12>
                   <v-autocomplete
                     id="cmpltAssociado"
-                    v-validate="'required|alpha_num'"
+                    v-validate="'required|min:11'"
                     item-text="cpf"
                     return-object
                     v-model="editedItem.associado"
@@ -99,7 +99,7 @@
 
                 <v-flex xs12>
                   <v-text-field
-                    v-validate="'required'"
+                    v-validate="'required|min:4|alpha_spaces'"
                     v-model="editedItem.associado.nome"
                     label="Nome"
                     readonly
@@ -110,7 +110,7 @@
 
                 <v-flex xs12>
                     <v-text-field
-                      v-validate="'required|decimal'"
+                      v-validate="'required|decimal|min_value:0.01'"
                       v-model="editedItem.associado.valorAtual"
                       :error-messages="errors.collect('valorPago')"
                       label="Valor Pago"
@@ -176,13 +176,17 @@
                     required
                   ></v-select>
                 </v-flex>
-                  
+ <!--                 
+<pre>{{"completed = " + isCompleted}}</pre>
+<p></p>
+<pre>{{"            errors = " + errors.any()}}</pre>
+-->
                   </v-layout>
                 </v-container>
               </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn id="salvar" color="grey lighten-1" @click.native="save" >Salvar</v-btn> <!--:disabled="errors.any() || !isCompleted" -->
+              <v-btn id="salvar" color="grey lighten-1" @click.native="save" :disabled="errors.any() || !isCompleted">Salvar</v-btn> <!--:disabled="errors.any() || !isCompleted" -->
               <v-btn color="grey lighten-1" @click.native="close">Cancelar</v-btn>
             </v-card-actions>
             </form>
@@ -306,18 +310,23 @@ export default {
       attributes: {},
       custom: {
         cpf: {
-          required: () => "Informe o cpf do Associado!",
-          alpha_num: () => "Informe um CPF valido!"
+          required: () => "Informe o CPF do associado!",
+          alpha_num: () => "Informe um CPF valido!",
+          min: () => "Informe um CPF valido!"
         },
         nome: {
-          required: () => "O Associado não foi encontrado!"
+          required: () => "Informe o nome do associado!",
+          min: () => "O nome do associado deve conter no minimo 4 caracteres!",
+          alpha_spaces: () => "Informe um nome valido!"
         },
         valorPago: {
           required: () => "Informe o valor do pagamento!",
-          decimal: () => "Informe um valor valido!"
+          decimal: () => "Informe um valor valido!",
+          min_value: () => "O valor do pagamento não pode ser negativo ou zero!"
         },
         dataPgto: {
-          required: () => "Informe a data do Pagamento!"
+          required: () => "Informe o dia do vencimento do pagamento",
+          numeric: () => "Informe o dia do vencimento do pagamento!"
         },
         formapgto: {
           required: () => "Selecione a forma do Pagamento!"
@@ -347,10 +356,11 @@ export default {
     },
     isCompleted() {
       return (
-        // this.editedItem.valorPago &&
-        // this.editedItem.dataPgto &&
-        this.editedItem.formapgto
-        // this.editedItem.formaPgto.associado.nome &&
+        this.editedItem.associado.valorAtual &&
+        this.date &&
+        this.editedItem.formapgto &&
+        this.editedItem.associado.cpf &&
+        this.editedItem.associado.nome
       );
     }
   },
@@ -526,12 +536,13 @@ export default {
     },
 
     limparCampos() {
-      (this.editedItem.associado = ""),
-        (this.editedItem.associado.nome = ""),
-        (this.editedItem.valorAtual = ""),
+      (this.editedItem.associado.nome = ""),
+        (this.editedItem.associado.cpf = ""),
+        (this.editedItem.associado.valorAtual = ""),
         (this.editedItem.id = ""),
         (this.editedItem.formapgto = "Dinheiro"),
-        (this.editedItem.dataPgto = ""),
+        (this.date = new Date().toISOString().substr(0, 10)),
+        (this.editedItem.associado = ""),
         this.$validator.reset();
     },
 
