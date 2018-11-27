@@ -233,7 +233,7 @@ export default {
       { text: "Opções", value: "Opções", sortable: false }
     ],
     associados: [],
-    editedIndex: NOT_FOUND,
+    editedIndex: -1,
     editedItem: {
       cpf: "",
       nome: "",
@@ -288,7 +288,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === NOT_FOUND ? "Novo Associado" : "Editar Associado";
+      return this.editedIndex === -1 ? "Novo Associado" : "Editar Associado";
     },
     pages() {
       if (
@@ -399,7 +399,7 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = NOT_FOUND;
+        this.editedIndex = -1;
       }, 300);
     },
 
@@ -417,7 +417,7 @@ export default {
       console.log("cpf =" + this.editedItem.cpf);
       console.log("vencimento =" + this.editedItem.vencAtual);
 
-      if (this.editedIndex > NOT_FOUND) {
+      if (this.editedIndex > -1) {
         console.log("Edit - Associado");
         console.log("cpf =" + this.editedItem.cpf);
         console.log("vencimento =" + this.editedItem.vencAtual);
