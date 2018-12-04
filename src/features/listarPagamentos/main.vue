@@ -45,11 +45,14 @@
         </template>
 
         <template slot="no-data">
-          <v-alert :value="true" color="grey" icon="warning">
-              Não foi possível efetuar a comunicação com o servidor.
-              <v-btn color="white" @click="initialize">Atualizar</v-btn>
-          </v-alert>
-        </template>
+  <v-alert
+    :value="true"
+    color="grey"
+    icon="warning"
+  >Não foi possível efetuar a comunicação com o servidor.
+    <v-btn color="white" @click="initialize">Atualizar</v-btn>
+  </v-alert>
+</template>
 
         <v-alert slot="no-results" :value="true" color="grey" icon="warning">
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
@@ -103,6 +106,7 @@
                     v-model="editedItem.associado.nome"
                     label="Nome"
                     readonly
+                    background-color="grey lighten-1"
                     data-vv-name="nome"
                     required
                   ></v-text-field>
@@ -115,6 +119,7 @@
                       :error-messages="errors.collect('valorPago')"
                       label="Valor Pago"
                       data-vv-name="valorPago"
+                      prefix="R$ "
                       required
                     ></v-text-field>
                   </v-flex>

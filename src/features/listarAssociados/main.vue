@@ -45,11 +45,14 @@
         </template>
 
         <template slot="no-data">
-          <v-alert :value="true" color="grey" icon="warning">
-              Não foi possível efetuar a comunicação com o servidor.
-              <v-btn color="white" @click="initialize">Atualizar</v-btn>
-          </v-alert>
-        </template>
+  <v-alert
+    :value="true"
+    color="grey"
+    icon="warning"
+  >Não foi possível efetuar a comunicação com o servidor.
+    <v-btn color="white" @click="initialize">Atualizar</v-btn>
+  </v-alert>
+</template>
 
         <v-alert slot="no-results" :value="true" color="grey" icon="warning">
               Não foram encontradas referencias de "{{ search }}" durante a pesquisa!
@@ -136,6 +139,7 @@
                         :error-messages="errors.collect('valorAtual')"
                         label="Valor"
                         data-vv-name="valorAtual"
+                        prefix="R$ "
                         required
                       ></v-text-field>
                     </v-flex>
@@ -212,6 +216,7 @@ export default {
     hasSaved: false,
     hasEdited: false,
     hasDeleted: false,
+    cpfBuffer: "",
     pagination: {
       rowsPerPage: 10,
       totalItems: 0,
@@ -383,6 +388,7 @@ export default {
     editItem(item) {
       this.editedIndex = this.associados.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      this.cpfBuffer = this.editedItem.cpf;
       this.dialog = true;
     },
 
@@ -431,7 +437,7 @@ export default {
         console.log("vencimento =" + this.editedItem.vencAtual);
 
         axios
-          .put("/associado/" + this.editedItem.cpf, {
+          .put("/associado/" + this.cpfBuffer, {
             cpf: this.editedItem.cpf,
             nome: this.editedItem.nome,
             celular: this.editedItem.celular,

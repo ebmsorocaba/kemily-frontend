@@ -7,6 +7,7 @@ const ASSOCIADOS = '/associados'
 const ASSOCIADO = '/associado'
 const USUARIOS = '/usuarios'
 const PAGAMENTOS = '/pagamentos'
+const RELATORIO = '/relatPag'
 
 export default {
   getAssociados() {
@@ -20,6 +21,9 @@ export default {
   },
   getPagamentos() {
     return ezFetch.get(`${API}/${PAGAMENTOS}`)
+  },
+  getRelatorio(dataInicio, dataFim) {
+    return ezFetch.get(`${API}/${RELATORIO}/?dataInicio=${dataInicio}&dataFim=${dataFim}`)
   }
 
 }
