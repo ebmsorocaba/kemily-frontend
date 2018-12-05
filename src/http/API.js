@@ -7,7 +7,7 @@ const ASSOCIADOS = '/associados'
 const ASSOCIADO = '/associado'
 const USUARIOS = '/usuarios'
 const PAGAMENTOS = '/pagamentos'
-const RELATORIO = '/relatPag'
+const RELATORIO = '/relatoriopagamentos'
 
 export default {
   getAssociados() {

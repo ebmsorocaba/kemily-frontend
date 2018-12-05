@@ -10,7 +10,7 @@
           <v-flex xs2>
             <v-dialog
               ref="diagInicio"
-              v-model="modal"
+              v-model="modalInicio"
               :return-value.sync="dataInicio"
               lazy
               full-width
@@ -19,10 +19,8 @@
               <v-text-field
                 v-validate="'required'"
                 slot="activator"
-                v-model="dataInicio"
-                :error-messages="errors.collect('dataInicio')"
+                v-model="this.formatDate(dataInicio)"
                 label="Data Inicial"
-                data-vv-name="dataInicio"
                 readonly
               ></v-text-field>
               <v-date-picker
@@ -33,18 +31,18 @@
                 locale="pt-br"
               >
                 <v-spacer></v-spacer>
-                <v-btn flat color="black" @click="modal = false">Cancelar</v-btn>
-                <v-btn flat color="black" @click="$refs.dialog.save(dataInicio)">OK</v-btn>
+                <v-btn flat color="black" @click="modalInicio = false">Cancelar</v-btn>
+                <v-btn flat color="black" @click="$refs.diagInicio.save(dataInicio)">OK</v-btn>
               </v-date-picker>
             </v-dialog>
           </v-flex>
-
+          
           <v-spacer></v-spacer>
 
           <v-flex xs2>
             <v-dialog
-              ref="diagInicio"
-              v-model="modal"
+              ref="diagFim"
+              v-model="modalFim"
               :return-value.sync="dataFim"
               lazy
               full-width
@@ -53,10 +51,8 @@
               <v-text-field
                 v-validate="'required'"
                 slot="activator"
-                v-model="dataFim"
-                :error-messages="errors.collect('dataFim')"
+                v-model="this.formatDate(dataFim)"
                 label="Data Final"
-                data-vv-name="dataFim"
                 readonly
               ></v-text-field>
               <v-date-picker
@@ -67,15 +63,15 @@
                 locale="pt-br"
               >
                 <v-spacer></v-spacer>
-                <v-btn flat color="black" @click="modal = false">Cancelar</v-btn>
-                <v-btn flat color="black" @click="$refs.dialog.save(dataFim)">OK</v-btn>
+                <v-btn flat color="black" @click="modalFim = false">Cancelar</v-btn>
+                <v-btn flat color="black" @click="$refs.diagFim.save(dataFim)">OK</v-btn>
               </v-date-picker>
             </v-dialog>
           </v-flex>
 
           <v-spacer></v-spacer>
 
-          <v-btn color="grey lighten-2" @click="">Nova Consulta</v-btn>
+          <v-btn color="grey lighten-2" @click="generateReport()">Nova Consulta</v-btn>
 
       </v-toolbar>
 
@@ -89,9 +85,11 @@
       >
 
         <template slot="items" slot-scope="props">
-          <td class="text-xs-left">{{ formatCPF(props.item.cpf) }}</td>
-          <td class="text-xs-left">{{ props.item.nome }}</td>
-          <td class="text-xs-left">{{ fixCurrency(props.item.total) }}</td>
+          <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
+          <td class="text-xs-left">{{ formatCPF(props.item.associado.cpf) }}</td>
+          <td class="text-xs-left">{{ props.item.associado.nome }}</td>
+          <td class="text-xs-left">{{ fixCurrency(props.item.valorPago) }}</td>
+          <td class="text-xs-left">{{ props.item.formapgto }}</td>
         </template>
 
         <template slot="footer">
@@ -124,6 +122,8 @@
   </v-card>
 
   </div>
+
+  
 </template>
 
 <script>
@@ -137,12 +137,12 @@ export default {
   },
 
   data: () => ({
-    date: new Date().toISOString().substr(0, 10),
-    modal: false,
+    modalFim: false,
+    modalInicio: false,
     search: "",
-    dataInicio: "01-01-2017",
-    dataFim: "01-01-2019",
-    total: 1000,
+    dataInicio: new Date().toISOString().substr(0, 10),
+    dataFim: new Date().toISOString().substr(0, 10),
+    total: "",
     pagination: {
       rowsPerPage: 0,
       totalItems: 0,
@@ -151,61 +151,53 @@ export default {
     dialog: false,
     headers: [
       {
+        text: "Data do Pagamento",
+        align: "left",
+        sortable: false,
+        value: "dataPgto"
+      },
+      {
         text: "CPF",
         align: "left",
         sortable: false,
-        value: "cpf"
+        value: "associado.cpf"
       },
 
       {
         text: "Nome",
         align: "left",
-        value: "nome",
+        value: "associado.nome",
         sortable: false
       },
       {
-        text: "Total Pago",
-        value: "total",
+        text: "Valor Pago",
+        value: "valorPago",
         calcular: true,
+        sortable: false
+      },
+      {
+        text: "Forma do Pagamento",
+        value: "formapgto",
         sortable: false
       }
     ],
     pagamentos: [],
-    relatorio: [],
-    dictionary: {
-      attributes: {},
-      custom: {
-        cpf: {
-          required: () => "Informe o CPF do associado!",
-          alpha_num: () => "Informe um CPF valido!",
-          min: () => "Informe um CPF valido!"
-        },
-        nome: {
-          required: () => "Informe o nome do associado!",
-          min: () => "O nome do associado deve conter no minimo 4 caracteres!",
-          alpha_spaces: () => "Informe um nome valido!"
-        },
-        valorPago: {
-          required: () => "Informe o valor do pagamento!",
-          decimal: () => "Informe um valor valido!",
-          min_value: () => "O valor do pagamento não pode ser negativo ou zero!"
-        },
-        dataPgto: {
-          required: () => "Informe o dia do vencimento do pagamento",
-          numeric: () => "Informe o dia do vencimento do pagamento!"
-        },
-        formapgto: {
-          required: () => "Selecione a forma do Pagamento!"
-        }
-      }
-    },
-    formasPgto: ["Dinheiro", "Cartão", "Boleto"]
+    relatorio: []
   }),
 
   computed: {
     dataPgto() {
       return this.date ? moment(this.date).format("DD/MM/YYYY") : "";
     },
+
+    dataInicio() {
+      return this.date ? moment(this.date).format("DD/MM/YYYY") : "";
+    },
+
+    dataFim() {
+      return this.date ? moment(this.date).format("DD/MM/YYYY") : "";
+    },
+
     formTitle() {
       return this.editedIndex === -1 ? "Novo Pagamento" : "Editar Pagamento";
     },
@@ -218,15 +210,6 @@ export default {
 
       return Math.ceil(
         this.pagination.totalItems / this.pagination.rowsPerPage
-      );
-    },
-    isCompleted() {
-      return (
-        this.editedItem.associado.valorAtual &&
-        this.date &&
-        this.editedItem.formapgto &&
-        this.editedItem.associado.cpf &&
-        this.editedItem.associado.nome
       );
     }
   },
@@ -281,17 +264,23 @@ export default {
       return cpf.replace(/[^\d]/g, "");
     },
 
-    load() {
+    generateReport() {
       console.log("inicio " + this.dataInicio);
       console.log("fim " + this.dataFim);
 
-      API.getRelatorio(this.dataInicio, this.dataFim).then(response => {
+      API.getRelatorio(
+        this.formatDate(this.dataInicio),
+        this.formatDate(this.dataFim)
+      ).then(response => {
         this.relatorio = response;
         console.dir("retornou " + this.relatorio);
       });
       this.pagination.totalItems = this.relatorio.length;
       this.pagination.rowsPerPage = this.relatorio.length;
+      this.load();
     },
+
+    load() {},
 
     initialize() {
       this.load();
