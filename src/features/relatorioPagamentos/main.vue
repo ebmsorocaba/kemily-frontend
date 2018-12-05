@@ -74,31 +74,33 @@
           <v-btn color="grey lighten-2" @click="generateReport()">Nova Consulta</v-btn>
 
       </v-toolbar>
+      <div ref="dataDiv">
+        <v-data-table
+          ref="datatable"
+          id="datatable"
+          :headers="headers"
+          :items="relatorio"
+          :search="search"
+          :pagination.sync="pagination"
+          hide-actions
+        >
 
-      <v-data-table
-        ref="table"
-        :headers="headers"
-        :items="relatorio"
-        :search="search"
-        :pagination.sync="pagination"
-        hide-actions
-      >
+          <template slot="items" slot-scope="props">
+            <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
+            <td class="text-xs-left">{{ formatCPF(props.item.associado.cpf) }}</td>
+            <td class="text-xs-left">{{ props.item.associado.nome }}</td>
+            <td class="text-xs-left">{{ fixCurrency(props.item.valorPago) }}</td>
+            <td class="text-xs-left">{{ props.item.formapgto }}</td>
+          </template>
 
-        <template slot="items" slot-scope="props">
-          <td class="text-xs-left">{{ formatDate(props.item.dataPgto) }}</td>
-          <td class="text-xs-left">{{ formatCPF(props.item.associado.cpf) }}</td>
-          <td class="text-xs-left">{{ props.item.associado.nome }}</td>
-          <td class="text-xs-left">{{ fixCurrency(props.item.valorPago) }}</td>
-          <td class="text-xs-left">{{ props.item.formapgto }}</td>
-        </template>
-
-        <template slot="footer">
+          <template slot="footer">
   <tr class="text-xs-center" v-for="(column, index) in headers">
     <strong v-if="column.calcular">Total: {{ fixCurrency(calcTotal(column)) }}</strong>
   </tr>
 </template>
 
-      </v-data-table>
+        </v-data-table>
+      </div>
     
           <v-btn  id="_csv"
                   fab
@@ -107,6 +109,7 @@
                   right
                   absolute
                   color="green lighten"
+                  @click="csvExport(csvData)"
           ><v-icon dark>print</v-icon></v-btn>
 
             <v-btn  id="_pdf"
@@ -116,11 +119,12 @@
                   right
                   absolute
                   color="red"
+                  @click="pdfExport()"
           ><v-icon dark>print</v-icon></v-btn>
 
         
   </v-card>
-
+  
   </div>
 
   
@@ -130,6 +134,8 @@
 import API from "@/http/API";
 import axios from "@/http/http-common";
 import moment from "moment";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default {
   $_veeValidate: {
@@ -142,7 +148,16 @@ export default {
     search: "",
     dataInicio: new Date().toISOString().substr(0, 10),
     dataFim: new Date().toISOString().substr(0, 10),
-    total: "",
+    dataAtual: new Date().toISOString().substr(0, 10),
+    buffer: [
+      {
+        dataPgto: "",
+        cpf: "",
+        nome: "",
+        valorPago: "",
+        formapgto: ""
+      }
+    ],
     pagination: {
       rowsPerPage: 0,
       totalItems: 0,
@@ -182,7 +197,8 @@ export default {
       }
     ],
     pagamentos: [],
-    relatorio: []
+    relatorio: [],
+    total: ""
   }),
 
   computed: {
@@ -211,6 +227,15 @@ export default {
       return Math.ceil(
         this.pagination.totalItems / this.pagination.rowsPerPage
       );
+    },
+    csvData() {
+      return this.relatorio.map(item => ({
+        DataPgto: this.formatDate(item.dataPgto),
+        Cpf: this.formatCPF(item.associado.cpf),
+        Nome: item.associado.nome,
+        Valor: item.valorPago,
+        FormaPgto: item.formapgto
+      }));
     }
   },
 
@@ -240,11 +265,8 @@ export default {
       return moment(date).format("DD/MM/YYYY");
     },
 
-    formatAxiosDate(date) {
-      if (!date) return null;
-      const [day, month, year] = date.split("/");
-      console.log("axios date: " + year + "-" + month + "-" + day);
-      return `${year}-${month}-${day}`;
+    formatCSVDate(date) {
+      return moment(date).format("DD-MM-YYYY");
     },
 
     fixCurrency(number) {
@@ -296,13 +318,80 @@ export default {
     },
 
     calcTotal(column) {
-      const table = this.$refs.table;
-      //console.log('table',table);
-      return table
-        ? table.filteredItems.reduce((s, i) => {
-            return s + parseInt(i[column.value], 10);
+      const datatable = this.$refs.datatable;
+      //console.log("table", datatable);
+      return datatable
+        ? datatable.filteredItems.reduce((s, i) => {
+            this.total = s + parseFloat(i[column.value], 10);
+            return s + parseFloat(i[column.value], 10);
           }, 0)
         : 0;
+    },
+
+    csvExport(arrData) {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += [
+        Object.keys(arrData[0]).join(";"),
+        ...arrData.map(item => Object.values(item).join(";"))
+      ]
+        .join("\n")
+        .replace(/(^\[)|(\]$)/gm, "");
+
+      const data = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", data);
+      link.setAttribute(
+        "download",
+        "relatorio_" + this.formatCSVDate(this.dataAtual) + ".csv"
+      );
+      link.click();
+    },
+
+    pdfExport() {
+      let pdfName = "relatorio_" + this.formatCSVDate(this.dataAtual);
+
+      var columns = [
+        "Data do Pagamento",
+        "CPF",
+        "Nome",
+        "Valor Pago",
+        "Forma do Pagto"
+      ];
+      var rows = this.relatorio.map(function(data) {
+        return [
+          data.dataPgto,
+          data.associado.cpf,
+          data.associado.nome,
+          data.valorPago,
+          data.formapgto
+        ];
+      });
+
+      // Only pt supported (not mm or in)
+      var doc = new jsPDF("p", "pt");
+      doc.setFontSize(11);
+
+      doc.text(
+        "Relatório de Pagamentos:    " +
+          this.formatDate(this.dataInicio) +
+          "  a  " +
+          this.formatDate(this.dataFim),
+        40,
+        30
+      );
+
+      doc.text("Total: " + this.fixCurrency(this.total), 450, 30);
+
+      doc.autoTable(columns, rows);
+      doc.save(pdfName + ".pdf");
+    },
+    editItem(item) {
+      this.editedIndex = this.relatorio.indexOf(item);
+      this.buffer.dataPgto = this.formatDate(item.dataPgto);
+      this.buffer.cpf = item.associado.cpf;
+      this.buffer.nome = item.associado.nome;
+      this.buffer.valorPago = item.associado.valorPago;
+      this.buffer.formapgto = item.associado.formapgto;
     }
   }
 };
